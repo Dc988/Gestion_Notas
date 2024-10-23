@@ -9,27 +9,20 @@ class principal(General):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         
-        self.Data_panel_container()
-        self.Data_panel_menu()
-
+        self.Data_panel_container()           
         
-        self.visable =True
-
-    def Data_panel_menu(self):
-        self.add_btn_switch("Configuraciones",self.config_panel)
-        self.add_btn_switch("Notas",self.nota_panel)
     
     def Data_panel_container(self):
-        self.config_panel = Config_view(True)
-        self.add_Panel(self.config_panel)
+        self.config_panel = Config_view()
+        self.add_Panel("Configuraciones",self.config_panel,ft.icons.SETTINGS)
 
-        self.nota_panel = Notas_view(False)
-        self.add_Panel(self.nota_panel)
+        self.nota_panel = Notas_view()
+        self.add_Panel("Notas",self.nota_panel,ft.icons.NOTES)
     
     
-
-
 def main (page:ft.Page):
+    page.theme_mode=ft.ThemeMode.LIGHT
+    page.title="Gestor de Notas Sena"
     page.add(principal())
     
 

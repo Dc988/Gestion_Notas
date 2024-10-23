@@ -1,6 +1,9 @@
 import flet as ft
-class Notas_view(ft.Column):
-    def __init__(self,visable, **kwargs):
+class Notas_view(ft.Container):
+    def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        self.controls=[ft.Text("Panel Notas")]
-        self.visible=visable
+        col = ft.Column()
+        col.controls =[ft.Text("Non clickable")] 
+        self.margin=10
+        self.padding=10
+        self.content=col

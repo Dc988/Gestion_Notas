@@ -1,24 +1,21 @@
 import flet as ft
 
-class General(ft.Column):
+class General(ft.Tabs):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        self.panel_menu = ft.Row()
-        self.panel_container =ft.Row()
+        self.selected_index=1
+        self.animation_duration=1000
+        self.visable =True
+        self.expand=1
+        
+    def add_Panel(self, text,target, icon=None):
+        self.tabs.append(
+            ft.Tab(
+                text=text,
+                icon=icon,
+                content=target,
+            )
+        )
+        
 
-        self.controls=[self.panel_menu,self.panel_container]
-    
-    def add_btn_switch(self,text,target):
-        btn = ft.ElevatedButton(text=text, on_click=self.switch_panel,data=target)
-        self.panel_menu.controls.append(btn)
-    
-    def add_Panel(self, panel):
-        self.panel_container.controls.append(panel)
-
-    def switch_panel(self,e):
-        target = e.control.data
-
-        for control in self.panel_container.controls:
-            if(isinstance(control,ft.Column)):
-                control.visible = control==target
-        self.update()
+   
