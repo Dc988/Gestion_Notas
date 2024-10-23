@@ -1,34 +1,32 @@
 
 import flet as ft
+from General import General
 from Config_view import Config_view
 from Notas_view import Notas_view
 
-class principal(ft.Column):
+class principal(General):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         
-        p1 = Config_view(True)
-        p2 = Notas_view(False)
+        self.Data_panel_container()
+        self.Data_panel_menu()
 
-        self.btn_panel1 = ft.ElevatedButton(text="Configuraciones", on_click=self.switch_panel,data=p1)
-        self.btn_panel2 = ft.ElevatedButton(text="Panel 2", on_click=self.switch_panel,data=p2)
-        self.text = ft.Text("Principal")
-
-        self.controls=[ft.Row(controls=[self.btn_panel1,self.btn_panel2]),
-                       p1,
-                       p2]
+        
         self.visable =True
+
+    def Data_panel_menu(self):
+        self.add_btn_switch("Configuraciones",self.config_panel)
+        self.add_btn_switch("Notas",self.nota_panel)
     
-    def add_btn_switch(self,text,target):
-        pass
+    def Data_panel_container(self):
+        self.config_panel = Config_view(True)
+        self.add_Panel(self.config_panel)
+
+        self.nota_panel = Notas_view(False)
+        self.add_Panel(self.nota_panel)
     
-    def switch_panel(self,e):
-        target = e.control.data
-        for control in self.controls:
-            if(isinstance(control,ft.Column)):
-                control.visible = control==target
-        self.update()
+    
 
 
 def main (page:ft.Page):
