@@ -22,9 +22,7 @@ class Config_view(ft.Container):
                     self.txt_ruta_carpeta,
                     ft.IconButton(
                             icon=ft.icons.UPLOAD_FILE,
-                            on_click=lambda _: self.pick_file_dialogCarpeta.pick_files(
-                                allow_multiple=False,allowed_extensions=["xlsx"]
-                            ),
+                            on_click=lambda _: self.pick_file_dialogCarpeta.get_directory_path(),
                         )
                 ]),
             ft.Row([ft.ElevatedButton(
@@ -42,10 +40,12 @@ class Config_view(ft.Container):
         self.configController = ConfigController()
         self.ConfigController = ConfigController()
         self.col = ft.Column()
+        
         self.txt_ruta_archivo = ft.TextField(value="",read_only=True, label="Ruta Archivo Información", width=800, text_size=12)
         self.txt_ruta_carpeta = ft.TextField(value="",read_only=False, label="Ruta Carpeta Evidencias", width=800, text_size=12)
+        
         self.pick_file_dialogArchivo = ft.FilePicker(on_result=self.pick_file_result)
-        self.pick_file_dialogCarpeta = ft.FilePicker(on_result=self.pick_directory_result)
+        self.pick_file_dialogCarpeta = ft.FilePicker(on_result=self.get_directory_result)
         
 
 
@@ -71,12 +71,10 @@ class Config_view(ft.Container):
 
         self.txt_ruta_archivo.update()
     
-    def pick_directory_result(self,e: ft.FilePickerResultEvent):
-        self.txt_ruta_carpeta.value = (
-            ", ".join(map(lambda f: f.path, e.files)) if e.files else ""
-        )
-
+    def get_directory_result(self,e: ft.FilePickerResultEvent):
+        self.txt_ruta_carpeta.value = e.path if e.path else "Cancelled!"
         self.txt_ruta_carpeta.update()
+
 
 
 
