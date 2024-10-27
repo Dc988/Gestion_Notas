@@ -1,29 +1,39 @@
 
 import flet as ft
-from General import General
+from layouts.TapContainer import TapContainer
+
 from Config_view import Config_view
 from Notas_view import Notas_view
 
-class principal(General):
+class principal(TapContainer):
 
-    def __init__(self, **kwargs):
+    def __init__(self,page,**kwargs):
         super().__init__(**kwargs)
-        
+        self.page = page
         self.Data_panel_container()           
         
-    
     def Data_panel_container(self):
-        self.config_panel = Config_view()
-        self.add_Panel("Configuraciones",self.config_panel,ft.icons.SETTINGS)
+        
+        config_panel = Config_view(self.page)
+        self.add_Panel(
+            text="Configuraciones",
+            target=config_panel,
+            icon=ft.icons.SETTINGS)
 
-        self.nota_panel = Notas_view()
-        self.add_Panel("Notas",self.nota_panel,ft.icons.NOTES)
+        nota_panel = Notas_view(self.page)
+        self.add_Panel(
+            text="Notas",
+            target=nota_panel,
+            icon=ft.icons.NOTES)
+        
+    
     
     
 def main (page:ft.Page):
     page.theme_mode=ft.ThemeMode.LIGHT
     page.title="Gestor de Notas Sena"
-    page.add(principal())
+
+    page.add(principal(page))
     
 
 print("ejecutando")
