@@ -112,10 +112,9 @@ class Config_view(PanelContainer):
             self.txt_extencion.value=data.get("extension")
             
         else:
-            try:
-                self.showAlertDialog("Error! Panel Configuraciones","No se pudo cargar información del archivo!",ft.icons.ERROR)
-            except Exception as ex:
-               pass
+            
+            self.showAlertDialog("Error! Panel Configuraciones","No se pudo cargar información del archivo!",ft.icons.ERROR)
+            
             
     def pick_file_result(self,e: ft.FilePickerResultEvent):
         self.txt_ruta_archivo.value = (
@@ -132,7 +131,16 @@ class Config_view(PanelContainer):
     def get_directory_result(self,e: ft.FilePickerResultEvent):
         self.txt_ruta_carpeta.value = e.path if e.path else self.txt_ruta_carpeta.value
         self.txt_ruta_carpeta.update()
-
+    
+    def getRuta(self):
+        return self.txt_ruta_archivo.value
+    
+    def getExtencion(self):
+        return self.txt_extencion.value
+    
+    def getRutaCarpeta(self):
+        return self.txt_ruta_carpeta.value
+    
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = super(Config_view, cls).__new__(cls)

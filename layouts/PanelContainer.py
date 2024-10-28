@@ -5,17 +5,20 @@ class PanelContainer(ft.Container):
       super().__init__(**kwargs)
       
    def showAlertDialog(self,title,content,icon:ft.icons=None):
-      self.alert = ft.AlertDialog(
-         title= ft.Text(title),
-         content=ft.Text(content),
-         icon=self.defineIcon(icon),
-      )
+      try:
+         self.alert = ft.AlertDialog(
+            title= ft.Text(title),
+            content=ft.Text(content),
+            icon=self.defineIcon(icon),
+         )
 
-      self.alert.actions=[
-         ft.TextButton("Aceptar", on_click=self.close_alert,data=self.alert)
-      ]
-      
-      self.page.open(self.alert)
+         self.alert.actions=[
+            ft.TextButton("Aceptar", on_click=self.close_alert,data=self.alert)
+         ]
+         
+         self.page.open(self.alert)
+      except Exception:
+         pass
       
    def showOptionDialog(self,title,YesOption,icon:ft.icons=None):
       
@@ -47,6 +50,8 @@ class PanelContainer(ft.Container):
             color = ft.colors.GREEN
          case ft.icons.ERROR:
             color = ft.colors.RED
+         case ft.icons.THUMB_UP:
+            color = ft.colors.LIGHT_BLUE_100
          case _:
             color= None
 
