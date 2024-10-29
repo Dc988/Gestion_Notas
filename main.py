@@ -10,7 +10,9 @@ class principal(TapContainer):
     def __init__(self,page,**kwargs):
         super().__init__(**kwargs)
         self.page = page
-        self.Data_panel_container()           
+        self.Data_panel_container()
+       
+
         
     def Data_panel_container(self):
         

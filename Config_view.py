@@ -15,33 +15,22 @@ class Config_view(PanelContainer):
         self.col.controls=[
             self.pick_file_dialogArchivo,
             self.pick_file_dialogCarpeta,
-            
-            ft.CupertinoListTile(
-                
-                leading=ft.Icon(name=ft.icons.ATTACH_FILE),
-                title=ft.Text("Ruta Archivo Información"),                
-                subtitle=self.txt_ruta_archivo,
-                trailing=ft.IconButton(
-                            icon=ft.icons.UPLOAD_FILE,
-                            on_click=lambda _: self.pick_file_dialogArchivo.pick_files(
-                                allow_multiple=False,allowed_extensions=["xlsx","csv"]
-                            ),
-                        )),
-                    
-            ft.CupertinoListTile(
-                leading=ft.Icon(name=ft.icons.FILE_COPY_ROUNDED),
-                title=ft.Text("Tipo de documento"),                
-                subtitle=self.txt_extencion),
-            
-            ft.CupertinoListTile(
-                leading=ft.Icon(name=ft.icons.DRIVE_FILE_MOVE_SHARP),
-                title=ft.Text("Ruta Carpeta Evidencias"),                
-                subtitle=self.txt_ruta_carpeta,
-                trailing=ft.IconButton(
+            self.component_container(expand=False,name="Ruta Archivo Información",
+                                     control=self.txt_ruta_archivo,
+                                    icon =ft.icons.DRIVE_FILE_MOVE_SHARP,
+                                     trailing=ft.IconButton(
+                                                    icon=ft.icons.UPLOAD_FILE,
+                                                    on_click=lambda _: self.pick_file_dialogArchivo.pick_files(
+                                                        allow_multiple=False,allowed_extensions=["xlsx","csv"]
+                                                    ),
+                                                )),
+                     
+            self.component_container(expand=False,name="Tipo de documento",control=self.txt_extencion,trailing=None,icon=ft.icons.FILE_COPY_ROUNDED),
+            self.component_container(expand=False,name="Ruta Carpeta Evidencias",control=self.txt_ruta_carpeta,trailing=ft.IconButton(
                             icon=ft.icons.UPLOAD_FILE,
                             on_click=lambda _: self.pick_file_dialogCarpeta.get_directory_path(),
-                        )),
-        
+                        ),icon=ft.icons.DRIVE_FILE_MOVE_SHARP),            
+                       
             ft.Row([
                 ft.ElevatedButton(
                         "GUARDAR CAMBIOS",

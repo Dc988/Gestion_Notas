@@ -59,3 +59,18 @@ class PanelContainer(ft.Container):
           
    def close_alert(self, e):
         self.page.close(e.control.data)
+   
+   def component_container(self,expand:int|bool, name:str, control,trailing:None,icon=None):
+        return ft.Container(
+            expand=expand,
+            height=60,
+            bgcolor="#ebebeb",
+            border_radius=6,
+            padding=8,
+            content=ft.CupertinoListTile(
+               
+                leading=ft.Icon(name=icon),
+                title=ft.Text(name),                
+                subtitle=control,
+                trailing=trailing)
+        )
