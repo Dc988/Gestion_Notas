@@ -15,16 +15,42 @@ class DataController():
                     self.document = pd.read_csv(self.ruta_archivo,sep=";")
                 case _:
                     pass
-        except Exception:
-            pass            
+            self.initializeFrame()       
+        except Exception as e:
+            print(self.__class__,"read_file",e)
+
         return False if self.document is None else True
+
+    def initializeFrame(self):
+        if self.document is not None:
+            self.document.fillna("", inplace=True)
+            self.document.sort_values(by="index",ascending=False)
+
+    def getColumns(self):
+        return self.document.columns
     
+    def getData(self):
+        return self.document
     
+    def setFilter(self, filter:dict):
+        data = None 
+        if self.document is not None:
+            try:
+                data = self.document
+                for columna, valores in filter.items():
+                    data = data[data[columna].isin(valores)]
+                
+            except Exception as e:
+                print(self.__class__,"setFilter",e)
+        return data
+
     def add_row(self, row):
         try:
             self.document = pd.concat([self.document, row], ignore_index=True)
 
-        except Exception:
+        except Exception as e:
+            print(self.__class__,"add_row",e)
+            
             return False
         return True
 
@@ -33,12 +59,6 @@ class DataController():
         
     def drop_row(self, index):
         self.document = self.document.drop(index).reset_index(drop=True)
-        
-
-
-
-
-
 
 
 

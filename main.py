@@ -33,6 +33,7 @@ class principal(TapContainer):
     
 def main (page:ft.Page):
     page.theme_mode=ft.ThemeMode.LIGHT
+    
     page.title="Gestor de Notas Sena"
 
     page.add(principal(page))

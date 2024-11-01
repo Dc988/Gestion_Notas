@@ -19,15 +19,15 @@ class Config_view(PanelContainer):
                                      control=self.txt_ruta_archivo,
                                     icon =ft.icons.DRIVE_FILE_MOVE_SHARP,
                                      trailing=ft.IconButton(
-                                                    icon=ft.icons.UPLOAD_FILE,
+                                                    icon=ft.icons.ADD,
                                                     on_click=lambda _: self.pick_file_dialogArchivo.pick_files(
-                                                        allow_multiple=False,allowed_extensions=["xlsx","csv"]
+                                                        allow_multiple=False,allowed_extensions=["xlsx"]
                                                     ),
                                                 )),
                      
             self.component_container(expand=False,name="Tipo de documento",control=self.txt_extencion,trailing=None,icon=ft.icons.FILE_COPY_ROUNDED),
             self.component_container(expand=False,name="Ruta Carpeta Evidencias",control=self.txt_ruta_carpeta,trailing=ft.IconButton(
-                            icon=ft.icons.UPLOAD_FILE,
+                            icon=ft.icons.ADD,
                             on_click=lambda _: self.pick_file_dialogCarpeta.get_directory_path(),
                         ),icon=ft.icons.DRIVE_FILE_MOVE_SHARP),            
                        
@@ -35,12 +35,14 @@ class Config_view(PanelContainer):
                 ft.ElevatedButton(
                         "GUARDAR CAMBIOS",
                         icon=ft.icons.SAVE,
-                        on_click=self.save_data,
-                    )])
+                        on_click=self.save_data
+                    )],alignment="end")
             
             ]
                
-
+    def clear(self,e):
+         self.txt_ruta_archivo.value = ""
+         self.txt_ruta_archivo.update()
     def initialize_components(self):
         self.configController = ConfigController()
         

@@ -3,7 +3,7 @@ import flet as ft
 class TapContainer(ft.Tabs):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        self.selected_index=0
+        self.selected_index=1
         self.animation_duration=500
         self.visable =True
         self.expand=1

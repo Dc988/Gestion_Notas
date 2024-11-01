@@ -10,6 +10,7 @@ class ConfigController():
                 datos = json.load(f)
             return datos
         except Exception as e:
+            print(self.__class__,"read_document",e)
             return None
     
     def edit_json(self,data):
@@ -23,7 +24,7 @@ class ConfigController():
                     json.dump(datos, f, indent=4, ensure_ascii=False)
                 return True
             except Exception as e:
-                pass
+                print(self.__class__,"edit_json",e)
         return False
 
 

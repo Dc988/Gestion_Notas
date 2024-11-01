@@ -40,7 +40,8 @@ class Form(PanelContainer):
             "border_radius":8,
             "border":ft.border.all(1,"#ebebeb"),
             "bgcolor":"white10",
-            "padding":15
+            "padding":15,
+            "margin":ft.margin.only(top=15,bottom=5)
         }
         super().__init__(**form_style)
         self.datatable = dt

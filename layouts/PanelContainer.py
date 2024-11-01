@@ -17,8 +17,8 @@ class PanelContainer(ft.Container):
          ]
          
          self.page.open(self.alert)
-      except Exception:
-         pass
+      except Exception as ex:
+         print(self.__class__,"showAlertDialog",ex)
       
    def showOptionDialog(self,title,YesOption,icon:ft.icons=None):
       
