@@ -50,6 +50,8 @@ class Notas_view(PanelContainer):
 
     def setDataTable(self):
         # Configura el DataController con los valores actuales
+        self.showAlertDialog("Error!! Panel Notas", self.page.session.get("p1"), ft.icons.ERROR)
+        
         self.dataController = DataController(
             ruta=self.config_panel.txt_ruta_archivo.value,
             extencion=self.config_panel.txt_extencion.value
@@ -65,5 +67,9 @@ class Notas_view(PanelContainer):
                 self.tableData.dataController = self.dataController
                 self.tableData.setDataTable()
                 self.showAlertDialog("Mensaje!! Panel Notas", "Información cargada correctamente", ft.icons.THUMB_UP)
+
+
+
+
 
 

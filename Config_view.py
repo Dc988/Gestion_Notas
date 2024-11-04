@@ -81,7 +81,7 @@ class Config_view(PanelContainer):
                 title="Error!", 
                 content="No se pudo guardar la informacion!", 
                 icon=ft.icons.ERROR)
-
+        self.page.session.set("p1","pq_value")
         if (self.txt_ruta_archivo.value == "") or (self.txt_ruta_carpeta.value == ""):
             self.showAlertDialog(
                 title="Error!", 
