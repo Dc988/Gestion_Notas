@@ -1,14 +1,86 @@
+import os
 import flet as ft
+from layouts.PanelContainer import PanelContainer
+class editDataframe_view(PanelContainer):
 
-def main(page: ft.Page):
+    def __init__(self, page, **kwargs):
+        super().__init__(**kwargs)
+        self.page = page
+
+        self.initialize_components()
+        self.content = ft.Column([ft.ElevatedButton("abrir",on_click= lambda _: self.showModalDialog())])
+        
+    def initialize_components(self):
+        columns = [1,2,3,4,5,6]
+        self.txt_ruta_archivo = ft.Text(value="alue",size=15)
+        self.pick_file_dialogArchivo = ft.FilePicker(on_result=self.pick_file_result)
+
+        p2 = self.getContainer(
+            title="Columas Originales",
+            controls=[self.add_dragtarget_item(item) for index,item in enumerate(columns)]
+            )
+        
+        p1 =self.getContainer(
+                title="Columas Visibles",
+                controls=[self.add_draggle_item(index,item) for index,item in enumerate(columns)]
+        )
+
+        col = ft.Column(
+            controls=[
+                self.pick_file_dialogArchivo,
+                self.component_container(
+                    expand=False,
+                    name="Ruta Archivo Información",
+                    control=self.txt_ruta_archivo,
+                    icon =ft.icons.DRIVE_FILE_MOVE_SHARP,
+                    trailing=ft.IconButton(
+                                icon=ft.icons.ADD,
+                                on_click=lambda _: self.pick_file_dialogArchivo.pick_files(
+                                    allow_multiple=False,allowed_extensions=["xlsx"]
+                                ),
+                            )
+                ),
+                self.component_container(
+                    expand=False,
+                    name="Columnas del Archivo",
+                    icon =ft.icons.GRID_3X3,
+                    control=ft.Row(
+                        controls =[
+                            p1,
+                            ft.DragTarget(
+                                group="str",
+                                content=p2,
+                                on_accept=self.drag_accept,
+                            ),
+                        ]
+                    )
+                )
+                
+            ]
+        )
+
+        self.setModalDialog("EDITOR DATAFRAME",col,self.guardar)
+
+    def pick_file_result(self,e: ft.FilePickerResultEvent):
+        self.txt_ruta_archivo.value = (
+            ", ".join(map(lambda f: f.path, e.files)) if e.files else self.txt_ruta_archivo.value
+        )
+
+        self.txt_ruta_archivo.update()
+
+    def guardar(self):
+        return True
     
-    page.title = "Drag and Drop example"
-    page.theme_mode=ft.ThemeMode.LIGHT
-    
-    def getContainer(controls):
+    def getContainer(self,title,controls):
+        con =[ft.Text(title)]
+        con.extend(controls)
+
         return ft.Container(
                 padding=5, 
-                border=ft.border.all(2,"#ebebeb"),
+                width=300,
+                height=200,
+                bgcolor=ft.colors.WHITE,
+                border=ft.border.all(2,"#E3E3E3"),
                 border_radius=5,
                 alignment=ft.alignment.center,
                 content= ft.Column(
@@ -16,15 +88,18 @@ def main(page: ft.Page):
                     expand=True,
                     width=300,
                     height=200,
-                    controls=controls
+                    controls=con
                     ))
 
-    def add_dragtarget_item(text):
+    def add_dragtarget_item(self,text):
         def on_click(e):
             target = e.control.data
+            panel = e.control
+
             target.visible =True
-            e.control.visible =False
-            page.update()
+            panel.visible =False
+            panel.update()
+            target.update()
 
         return ft.ElevatedButton(
                 bgcolor="#ebebeb",
@@ -35,7 +110,7 @@ def main(page: ft.Page):
                              )
     
 
-    def add_draggle_item(index,text):
+    def add_draggle_item(self,index,text):
         return ft.Draggable(
                     group="str",
                     data=index,
@@ -49,51 +124,33 @@ def main(page: ft.Page):
                     ),
                 )
     
-    def drag_accept(e):
+    def drag_accept(self,e):
         # get draggable (source) control by its ID
-        src = page.get_control(e.src_id)
-      
-        index = src.data
-
-        #DragTarget
-        btn = e.control.content.content.controls[index]
-        btn.data = src
-        btn.visible=True
-        src.visible=False
-
-        page.update()
-
-
-    columns = [1,2,3,4,5,6]
-    p2 = getContainer(
-        controls=[add_dragtarget_item(item) for index,item in enumerate(columns)]
-        )
-    
-    p1 =getContainer(
-            controls=[add_draggle_item(index,item) for index,item in enumerate(columns)]
-    )
-
-    def p(e):
-        for btn in p2.content.controls:
-            print(btn.text) if btn.visible else None
         
+        draggable = self.page.get_control(e.src_id)
+        index = draggable.data
+        
+        drag = e.control.content.content
+        
+        #DragTarget
+        btn = drag.controls[index]
+        
+        btn.data = draggable
+        btn.visible=True
+        draggable.visible=False
+        
+        drag.update()
+        draggable.update()
+
+def main(page: ft.Page):
+    page.title = "Drag and Drop example"
+    page.theme_mode=ft.ThemeMode.LIGHT
+   
+    d = editDataframe_view(page)
+    
+
     page.add(
-        ft.Row(
-            [
-                p1,
-                ft.DragTarget(
-                            group="str",
-                            content=p2,
-                            on_accept=drag_accept,
-                        ),
-            ]
-        ),
-        ft.TextButton(
-                text ="aceptar",
-                width=500,
-                visible=True,
-                on_click=p
-                             )
+        d
     )
 
 ft.app(main)

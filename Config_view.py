@@ -43,6 +43,7 @@ class Config_view(PanelContainer):
     def clear(self,e):
          self.txt_ruta_archivo.value = ""
          self.txt_ruta_archivo.update()
+         
     def initialize_components(self):
         self.configController = ConfigController()
         

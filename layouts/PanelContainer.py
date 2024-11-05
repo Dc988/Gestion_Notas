@@ -4,7 +4,7 @@ class PanelContainer(ft.Container):
    def __init__(self, **kwargs):
       super().__init__(**kwargs)
       
-   def showAlertDialog(self,title,content,icon:ft.icons=None):
+   def showAlertDialog(self,title:str,content:str,icon:ft.icons=None):
       try:
          self.alert = ft.AlertDialog(
             title= ft.Text(title),
@@ -19,7 +19,40 @@ class PanelContainer(ft.Container):
          self.page.open(self.alert)
       except Exception as ex:
          print(self.__class__,"showAlertDialog",ex)
+   
+   def setModalDialog(self,title:str,content:ft.Control,YesOption:callable,NoOption:callable =None):
+
+      def onYesOption(e):
+         if(YesOption()):
+            self.close_alert(e)
       
+      def onNoOption(e):
+         if NoOption !=None:
+            NoOption()
+         
+         self.close_alert(e)
+      
+      self.modal = ft.AlertDialog(
+         modal=True,
+         title= ft.Text(title,size=15,weight="bold"),
+         content=content,
+         actions_alignment=ft.MainAxisAlignment.END)
+      
+      self.modal.actions=[
+         ft.TextButton("Aceptar", on_click=onYesOption,data=self.modal),
+         ft.TextButton("Cancelar", on_click=onNoOption,data=self.modal),
+      ]
+
+   def showModalDialog(self):
+      try:
+        self.page.open(self.modal)
+      except Exception as ex:
+         print(self.__class__,"showModalDialog",ex)
+         pass
+      
+
+      
+
    def showOptionDialog(self,title,YesOption,icon:ft.icons=None):
       
       def onYesOption(e):
@@ -60,10 +93,10 @@ class PanelContainer(ft.Container):
    def close_alert(self, e):
         self.page.close(e.control.data)
    
-   def component_container(self,expand:int|bool, name:str, control,trailing:None,icon=None):
+   def component_container(self,expand:int|bool, name:str, control=None,trailing=None,icon=None):
         return ft.Container(
             expand=expand,
-            height=60,
+            
             bgcolor="#ebebeb",
             border_radius=6,
             padding=8,
