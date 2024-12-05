@@ -86,18 +86,25 @@ class editDataframe_view(PanelContainer):
     def guardar(self):
         self.selectedCols = []
         self.ruta = ""
+        band = True
         for item in self.dragTarget.content.controls:
-            
+
             if(type(item) is ft.ElevatedButton  and item.visible):
                 self.selectedCols.append(item.text)
 
         if(not self.selectedCols):
-            self.showErrorMsg("Seleccione al menos una columna!!!")
-            return False
+
+            self.showBottomSheetMsg("Seleccione al menos una columna!!!",ft.icons.ERROR)
+            band = False
+            
         if self.onYes !=None:
             self.ruta = self.txt_ruta_archivo.value
             self.onYes()
-        return True
+
+        return band 
+
+
+        
 
     
     def getContainer(self,title,controls):
@@ -189,13 +196,10 @@ class editDataframe_view(PanelContainer):
                 ruta=self.ruta
             )
 
-
             if not self.dataController.read_file():
-                self.showErrorMsg("Error!!, No se pudo cargar la información")
+                self.showBottomSheetMsg("Error!!, No se pudo cargar la información",ft.icons.ERROR)
             else:
-                data = self.dataController.getDataByColumns(['FASE', 'ACTIVIDAD', 'CODIGO ACTIVIDAD', 'EVIDENCIA', 'FECHA', 'NOTA', 'OBSERVACION'])
-                self.showErrorMsg()
-    
+                data = self.dataController.getDataByColumns(['FASE', 'ACTIVIDAD', 'CODIGO ACTIVIDAD', 'EVIDENCIA', 'FECHA', 'NOTA', 'OBSERVACION'])   
 
                 if(data is not None):
                     columns =self.dataController.getColumns()
@@ -215,6 +219,6 @@ class editDataframe_view(PanelContainer):
                     if self.dragTarget.page:
                         self.dragTarget.update()
                 else:
-                    self.showErrorMsg("Columnas no coinciden FASE, ACTIVIDAD, CODIGO ACTIVIDAD, EVIDENCIA, FECHA, NOTA, OBSERVACION")
+                    self.showBottomSheetMsg("Columnas no coinciden FASE, ACTIVIDAD, CODIGO ACTIVIDAD, EVIDENCIA, FECHA, NOTA, OBSERVACION",ft.icons.ERROR)
        
                     

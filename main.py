@@ -29,10 +29,6 @@ class principal(TapContainer):
     
 def main (page:ft.Page):
     page.window.maximized = True
-    page.window.resizable=False
-    page.window.maximizable=False
-    page.window.minimizable=False
-
     page.theme_mode=ft.ThemeMode.LIGHT
     page.title="Gestor de Notas Sena"
     

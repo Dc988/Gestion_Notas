@@ -1,6 +1,7 @@
 import flet as ft
 import os
 import datetime
+import shutil as sh
 from layouts.PanelContainer import PanelContainer
 
 class Form(PanelContainer):
@@ -25,86 +26,101 @@ class Form(PanelContainer):
         self.addControls()
         
     def addControls(self):
-        col=ft.Column(
-            width=1100,
-            expand=True,
-            scroll=ft.ScrollMode.ALWAYS,
-            controls=[
-                    ft.Row(controls=[
-                        self.component_container(
-                            expand=True,name="FASE",
-                            control=self.fase_txt,
-                            icon =ft.icons.TEXT_FIELDS,
-                            trailing=ft.IconButton(
-                                icon=ft.icons.ADD,
-                                on_click= lambda _: self.open_os(self.fase_txt.value)
-                            )),
-                        self.component_container(
-                            expand=True,name="ACTIVIDAD",
-                            control=self.actividad_txt,
-                            icon =ft.icons.TEXT_FIELDS,
-                            trailing=ft.IconButton(
-                                icon=ft.icons.ADD,
-                                on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}")
-                            )),
-                    
-                        self.component_container(
-                            expand=True,name="CODIGO ACTIVIDAD",
-                            control=self.cod_act_txt,
-                            icon =ft.icons.CODE,
-                            trailing=ft.IconButton(
-                                icon=ft.icons.ADD,
-                                on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}")
-                            )),
-                    ], expand=True),
-                    
-                    self.component_container(
-                        expand=True,name="EVIDENCIA",
-                        control=self.evid_txt,
-                        icon =ft.icons.BOOK,
-                        trailing=ft.IconButton(
-                            icon=ft.icons.ADD,
-                            on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}\\{self.evid_txt.value}")
-                        )),
+        col=ft.Row([
+                ft.NavigationRail(
+                    selected_index=0,
+                    label_type=ft.NavigationRailLabelType.NONE,
+                    width=40,
+                    min_extended_width=400,
+                    leading=ft.Column([
+                            ft.IconButton(
+                                icon=ft.icons.PICTURE_AS_PDF,
+                                on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\Guia_aprendizaje.pdf")
+                            ),
+                            ft.IconButton(
+                                icon=ft.icons.FILE_COPY,
+                                on_click=lambda _:self.copy_file_evi(origen="Format.docx",
+                                                                     to=f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}\\{self.evid_txt.value}\\{self.evid_txt.value}.docx")
+                            )
+                        ]),
+                    group_alignment=-0.9,
+                    destinations=[ft.NavigationRailDestination(disabled=True)]
+                ),
+                ft.VerticalDivider(width=1),
+                ft.Column(
+                    width=1100,
+                    controls=[
+                            ft.Row(controls=[
+                                self.component_container(
+                                    expand=True,name="FASE",
+                                    control=self.fase_txt,
+                                    icon =ft.icons.TEXT_FIELDS,
+                                    trailing=ft.IconButton(
+                                        icon=ft.icons.FOLDER,
+                                        on_click= lambda _: self.open_os(self.fase_txt.value)
+                                    )),
+                                self.component_container(
+                                    expand=True,name="ACTIVIDAD",
+                                    control=self.actividad_txt,
+                                    icon =ft.icons.TEXT_FIELDS,
+                                    trailing=ft.IconButton(
+                                        icon=ft.icons.FOLDER,
+                                        on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}")
+                                    )),
+                            
+                                self.component_container(
+                                    expand=True,name="CODIGO ACTIVIDAD",
+                                    control=self.cod_act_txt,
+                                    icon =ft.icons.CODE,
+                                    trailing=ft.IconButton(
+                                        icon=ft.icons.FOLDER,
+                                        on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}")
+                                    )),
+                            ]),
+                            ft.Row(controls=[
+                                self.component_container(
+                                    expand=True,name="EVIDENCIA",
+                                    control=self.evid_txt,
+                                    icon =ft.icons.BOOK,
+                                    trailing=ft.IconButton(
+                                        icon=ft.icons.FOLDER,
+                                        on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}\\{self.evid_txt.value}")
+                                    )),
+                            ]),
+                            
+                            ft.Row(controls=[
+                                self.component_container(
+                                    expand=True,name="NOTA",
+                                    control=self.nota_txt,
+                                    icon =ft.icons.NOTES),
 
-                    ft.Row(controls=[
-                        self.component_container(
-                            expand=True,name="NOTA",
-                            control=self.nota_txt,
-                            icon =ft.icons.NOTES),
-
-                        self.component_container(
-                            expand=True,name="FECHA",
-                            control=self.fecha_txt,
-                            icon =ft.icons.CALENDAR_MONTH,
-                            trailing=ft.IconButton(
-                                icon=ft.icons.EDIT_CALENDAR,
-                                on_click=lambda _:self.page.open(
-                                    self.dt
-                                )
-                            )),
-                        
-                        self.component_container(
-                            expand=True,name="IMPORTANTE",
-                            control=self.impr_check,
-                            icon =ft.icons.LABEL_IMPORTANT),
-                    ]),
-                    self.component_container(
-                                    expand=True,name="OBSERVACION",
-                                    control=self.cb,
-                                    icon =ft.icons.MENU_OPEN),
-                    ft.Row(controls=[
-                    
-                        self.component_container(
-                                    expand=True,name="OBSERVACION",
-                                    control=self.observacion_txt,
-                                    icon =ft.icons.MENU_OPEN),
-                        ft.IconButton(
-                            icon=ft.icons.PICTURE_AS_PDF,
-                            on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\Guia_aprendizaje.pdf")
-                        )
-                    ])
-            ]
+                                self.component_container(
+                                    expand=True,name="FECHA",
+                                    control=self.fecha_txt,
+                                    icon =ft.icons.CALENDAR_MONTH,
+                                    trailing=ft.IconButton(
+                                        icon=ft.icons.REMOVE_RED_EYE,
+                                        on_click=lambda _:self.page.open(
+                                            self.dt
+                                        )
+                                    )),
+                                
+                                self.component_container(
+                                    expand=True,name="IMPORTANTE",
+                                    control=self.impr_check,
+                                    icon =ft.icons.LABEL_IMPORTANT),
+                            ]),
+                            ft.Row(controls=[
+                                self.component_container(
+                                            expand=True,name="OBSERVACION",
+                                            control=self.observacion_txt,
+                                            icon =ft.icons.MENU_OPEN),
+                                ])                                
+                            
+                    ]
+                )
+            ],
+            expand=True
         )
         self.setModalDialog("EVIDENCIA",col,self.onYesOption)
 
@@ -145,9 +161,9 @@ class Form(PanelContainer):
             self.evid_txt .value=="" or
             self.fecha_txt .value=="" or
             self.nota_txt .value==""):
-                self.showErrorMsg("Campos obligatorios!!!")
+                self.showBottomSheetMsg("Campos obligatorios!!!",ft.icons.INFO)
         else:
-            self.showErrorMsg()
+            
             self.data = {
                 "FASE":self.fase_txt .value,
                 "ACTIVIDAD":self.actividad_txt .value,
@@ -167,15 +183,15 @@ class Form(PanelContainer):
             if (self.dataTable is not None):
                 self.dataTable.setDataTable()
             else:
-                self.showErrorMsg("Error!!! no se pudo actualizar la tabla")
+                self.showBottomSheetMsg("Error!!! no se pudo actualizar la tabla",ft.icons.ERROR)
 
 
         
     def setData(self, data):
         try:
             self.clear_data()
-            self.showErrorMsg()
-            self.showSuccessMsg()
+            
+            
 
             self.index_txt.value = data.name
             self.fase_txt .value = data["FASE" ]
@@ -205,9 +221,9 @@ class Form(PanelContainer):
             index = self.index_txt.value
             resp = self.dataController.edit_row(index,self.data)
             if(resp):
-                self.showSuccessMsg("Registro editado!")
+                self.showBottomSheetMsg("Registro editado!",ft.icons.THUMB_UP)
             else:
-                self.showErrorMsg("Error!!! no se pudo editado el registro")
+                self.showBottomSheetMsg("Error!!! no se pudo editado el registro",ft.icons.ERROR)
         else:
             print("edit datacontroller null")
 
@@ -218,9 +234,9 @@ class Form(PanelContainer):
             resp, index = self.dataController.add_row(self.data)
             if(resp):
                 self.index_txt.value = index
-                self.showSuccessMsg("Registro añadido!")
+                self.showBottomSheetMsg("Registro añadido!",ft.icons.THUMB_UP)
             else:
-                self.showErrorMsg("Error!!! no se pudo agrear el registro")
+                self.showBottomSheetMsg("Error!!! no se pudo agrear el registro",ft.icons.ERROR)
         else:
             print("save datacontroller null")
 
@@ -229,10 +245,18 @@ class Form(PanelContainer):
 
         if(os.path.exists(ruta)):
             os.startfile(ruta)
-            self.showSuccessMsg("Abriendo Ruta")
+            self.showBottomSheetMsg("Abriendo Ruta",ft.icons.THUMB_UP)
         else:
-            self.showErrorMsg("Error!! Ruta Inexistente")
-        print(ruta)
+            self.showBottomSheetOption("Ruta no existe, desea crear una?",lambda r = ruta: self.create_folder(r))
+
+    def create_folder(self,ruta):
+        try:
+            os.makedirs(ruta)
+            os.startfile(ruta)
+            self.showBottomSheetMsg("Abriendo Ruta",ft.icons.THUMB_UP)
+        except Exception as ex:
+            self.showBottomSheetMsg("Error al crear la carpeta",ft.icons.ERROR)
+            print(ex)
 
 
     def clear_data(self):
@@ -245,5 +269,85 @@ class Form(PanelContainer):
         self.nota_txt .value=""
         self.observacion_txt .value=""
         self.impr_check .value=False
+
+        self.evid_txt.on_submit = self.evidencia_on_submit
+
+    def copy_file_evi(self,origen, to):
+        def copy():
+            if (os.path.exists(origen)):
+                if(os.path.exists(to)):
+                    self.showBottomSheetMsg(f"Ya hay un formato creado",ft.icons.INFO)
+                else:
+                    try:
+                        sh.copy(origen, to)
+                        self.showBottomSheetMsg("Archivo creado correctamente",ft.icons.INFO)
+                    except Exception as e:
+                        self.showBottomSheetMsg("Error! No se pudo crear el Archivo",ft.icons.ERROR)
+                        print(e)
+
+
+
+            else:
+                self.showBottomSheetMsg(f"Plantilla no existe",ft.icons.ERROR)
+
+            
+        origen = f"{self.page.session.get("RutaOrigen")}\\{origen}"
+        to = f"{self.page.session.get("RutaOrigen")}\\{to}"
+
+        self.showBottomSheetOption("Desea generar el formato de la evidencia?",copy)
+
+
+        
+
+    def evidencia_on_submit(self,e):
+        def get_cod_evi(evidencia):
+            return evidencia[:evidencia.find("-EV")] if evidencia.find("-EV") != -1 else None
+
+        def get_activity(cod):
+            try:
+                
+                inicio = 2  # Corresponde al índice 3 en Excel (base 1)
+                longitud = cod.find("-") - inicio
+                extraido = cod[inicio:inicio + longitud]
+                resultado_si_error = f"P{extraido}"
+            except Exception:
+                resultado_si_error = None
+
+            return resultado_si_error
+
+        def get_fase(texto_mapeo):
+            # Diccionario de equivalencias
+            cambiar = {
+                "P1": "01. ANALISIS",
+                "P2": "01. ANALISIS",
+                "P3": "02. PLANEACION",
+                "P4": "02. PLANEACION",
+                "P5": "02. PLANEACION",
+                "P6": "03. EJECUCIÓN",
+                "P7": "03. EJECUCIÓN",
+                "P8": "03. EJECUCIÓN",
+                "P9": "04. EVALUACION"
+            }
+
+            return cambiar.get(texto_mapeo, None) 
+
+        evi = e.data
+
+        evi = get_cod_evi(evi)
+        self.cod_act_txt.value = evi
+
+        evi = get_activity(evi)
+        self.actividad_txt.value = evi
+
+        evi = get_fase(evi)
+        self.fase_txt.value = evi
+
+        self.fase_txt.update()  if self.fase_txt.page else None
+        self.actividad_txt.update() if self.actividad_txt.page else None
+        self.cod_act_txt.update() if self.cod_act_txt.page else None
+
+
+
+
 
 

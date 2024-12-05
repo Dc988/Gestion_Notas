@@ -14,7 +14,6 @@ class Notas_view(PanelContainer):
         
         
         self.initialize_components()
-        
         self.content.controls = [
             ft.Row(
              [
@@ -98,4 +97,6 @@ class Notas_view(PanelContainer):
                 self.showAlertDialog("Mensaje!! Panel Notas", "Información cargada correctamente", ft.icons.THUMB_UP)
         else:
             self.showAlertDialog("Error!! Panel Notas", "actualice panel de configuraciones", ft.icons.ERROR)
+
+
 

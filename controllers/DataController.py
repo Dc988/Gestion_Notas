@@ -27,7 +27,7 @@ class DataController():
 
     def initializeFrame(self):
         if self.document is not None:
-            self.document.fillna("", inplace=True)
+            self.document.fillna("--", inplace=True)
             self.document.sort_index(ascending=False,inplace=True)
 
     def getColumns(self):
@@ -55,8 +55,7 @@ class DataController():
                 self.initializeFrame()
                 data = self.document
                 for columna, valores in filter.items():
-
-                    data = data[data[columna].astype(str).str.startswith(tuple(valores), na=False)]
+                    data = data[data[columna].astype(str).str.startswith(tuple(valores), na=True)]
             except Exception as e:
                 print(self.__class__, "setFilter", e)
         return data
