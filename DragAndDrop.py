@@ -1,28 +1,37 @@
-import os
+
 import flet as ft
 from layouts.PanelContainer import PanelContainer
+from controllers.DataController import DataController
+
 class editDataframe_view(PanelContainer):
 
-    def __init__(self, page, **kwargs):
+    def __init__(self, page,url=None,onYes:callable=None,onNo:callable=None, **kwargs):
         super().__init__(**kwargs)
         self.page = page
 
-        self.initialize_components()
-        self.content = ft.Column([ft.ElevatedButton("abrir",on_click= lambda _: self.showModalDialog())])
-        
-    def initialize_components(self):
-        columns = [1,2,3,4,5,6]
-        self.txt_ruta_archivo = ft.Text(value="alue",size=15)
-        self.pick_file_dialogArchivo = ft.FilePicker(on_result=self.pick_file_result)
+        self.onYes=onYes
+        self.onNo=onNo
+        self.ruta = url
 
-        p2 = self.getContainer(
-            title="Columas Originales",
-            controls=[self.add_dragtarget_item(item) for index,item in enumerate(columns)]
+        self.initialize_components()
+
+    def initialize_components(self):
+        self.dataController = None
+        self.selectedCols = []
+
+        self.txt_ruta_archivo = ft.Text(value=self.ruta,size=15)
+        self.pick_file_dialogArchivo = ft.FilePicker(on_result=self.pick_file_result)
+        
+        
+
+        self.dragTarget = self.getContainer(
+            title="Columas Visibles",
+            controls=[]
             )
         
-        p1 =self.getContainer(
-                title="Columas Visibles",
-                controls=[self.add_draggle_item(index,item) for index,item in enumerate(columns)]
+        self.dragglePanel =self.getContainer(
+                title="Columas Originales",
+                controls=[]
         )
 
         col = ft.Column(
@@ -35,9 +44,9 @@ class editDataframe_view(PanelContainer):
                     icon =ft.icons.DRIVE_FILE_MOVE_SHARP,
                     trailing=ft.IconButton(
                                 icon=ft.icons.ADD,
-                                on_click=lambda _: self.pick_file_dialogArchivo.pick_files(
+                                on_click=lambda _:self.pick_file_dialogArchivo.pick_files(
                                     allow_multiple=False,allowed_extensions=["xlsx"]
-                                ),
+                                )
                             )
                 ),
                 self.component_container(
@@ -46,30 +55,50 @@ class editDataframe_view(PanelContainer):
                     icon =ft.icons.GRID_3X3,
                     control=ft.Row(
                         controls =[
-                            p1,
+                            self.dragglePanel,
                             ft.DragTarget(
                                 group="str",
-                                content=p2,
+                                content=self.dragTarget,
                                 on_accept=self.drag_accept,
                             ),
                         ]
                     )
-                )
-                
+                ),
+               
             ]
         )
 
-        self.setModalDialog("EDITOR DATAFRAME",col,self.guardar)
+        self.setModalDialog("EDITOR DATAFRAME",col,self.guardar,self.onNo)
+        self.InitializeData()
+
+        
+
 
     def pick_file_result(self,e: ft.FilePickerResultEvent):
         self.txt_ruta_archivo.value = (
             ", ".join(map(lambda f: f.path, e.files)) if e.files else self.txt_ruta_archivo.value
         )
 
+        self.ruta = self.txt_ruta_archivo.value
         self.txt_ruta_archivo.update()
+        self.InitializeData()
 
     def guardar(self):
+        self.selectedCols = []
+        self.ruta = ""
+        for item in self.dragTarget.content.controls:
+            
+            if(type(item) is ft.ElevatedButton  and item.visible):
+                self.selectedCols.append(item.text)
+
+        if(not self.selectedCols):
+            self.showErrorMsg("Seleccione al menos una columna!!!")
+            return False
+        if self.onYes !=None:
+            self.ruta = self.txt_ruta_archivo.value
+            self.onYes()
         return True
+
     
     def getContainer(self,title,controls):
         con =[ft.Text(title)]
@@ -91,9 +120,11 @@ class editDataframe_view(PanelContainer):
                     controls=con
                     ))
 
-    def add_dragtarget_item(self,text):
+    def add_dragtarget_item(self,index,text):
         def on_click(e):
-            target = e.control.data
+            index = e.control.data + 1
+            
+            target = self.dragglePanel.content.controls[index]
             panel = e.control
 
             target.visible =True
@@ -102,6 +133,7 @@ class editDataframe_view(PanelContainer):
             target.update()
 
         return ft.ElevatedButton(
+                data=index,
                 bgcolor="#ebebeb",
                 text =text,
                 width=300,
@@ -128,29 +160,61 @@ class editDataframe_view(PanelContainer):
         # get draggable (source) control by its ID
         
         draggable = self.page.get_control(e.src_id)
-        index = draggable.data
+        index = draggable.data + 1
         
         drag = e.control.content.content
         
         #DragTarget
         btn = drag.controls[index]
-        
-        btn.data = draggable
+
         btn.visible=True
         draggable.visible=False
         
         drag.update()
         draggable.update()
 
-def main(page: ft.Page):
-    page.title = "Drag and Drop example"
-    page.theme_mode=ft.ThemeMode.LIGHT
-   
-    d = editDataframe_view(page)
+    def setData(self, data):
+        for item in self.dragTarget.content.controls:
+            if(type(item) is ft.ElevatedButton and item.text in data):
+                item.visible = True
+
+        for item in  self.dragglePanel.content.controls:
+            if(type(item) is ft.Draggable and item.content.content.text in data):
+                item.visible = False
+        self.selectedCols = data
+        
+    def InitializeData(self):
+       if self.ruta!=None:
+            self.dataController = DataController(
+                ruta=self.ruta
+            )
+
+
+            if not self.dataController.read_file():
+                self.showErrorMsg("Error!!, No se pudo cargar la información")
+            else:
+                data = self.dataController.getDataByColumns(['FASE', 'ACTIVIDAD', 'CODIGO ACTIVIDAD', 'EVIDENCIA', 'FECHA', 'NOTA', 'OBSERVACION'])
+                self.showErrorMsg()
     
 
-    page.add(
-        d
-    )
+                if(data is not None):
+                    columns =self.dataController.getColumns()
 
-ft.app(main)
+                    con =[ft.Text("Columas Visibles")]
+                    con.extend([self.add_dragtarget_item(index,item) for index,item in enumerate(columns)])
+
+                    self.dragTarget.content.controls = con
+                
+                    con =[ft.Text("Columas Originales")]
+                    con.extend([self.add_draggle_item(index,item) for index,item in enumerate(columns)])
+
+                    self.dragglePanel.content.controls = con
+
+                    if self.dragglePanel.page:
+                        self.dragglePanel.update()
+                    if self.dragTarget.page:
+                        self.dragTarget.update()
+                else:
+                    self.showErrorMsg("Columnas no coinciden FASE, ACTIVIDAD, CODIGO ACTIVIDAD, EVIDENCIA, FECHA, NOTA, OBSERVACION")
+       
+                    

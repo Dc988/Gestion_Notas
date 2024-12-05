@@ -12,8 +12,6 @@ class principal(TapContainer):
         self.page = page
         self.Data_panel_container()
        
-
-        
     def Data_panel_container(self):
         
         config_panel = Config_view(self.page)
@@ -29,20 +27,19 @@ class principal(TapContainer):
             icon=ft.icons.NOTES)
         
     
-    
-    
 def main (page:ft.Page):
-    page.theme_mode=ft.ThemeMode.LIGHT
-    
-    page.title="Gestor de Notas Sena"
+    page.window.maximized = True
+    page.window.resizable=False
+    page.window.maximizable=False
+    page.window.minimizable=False
 
+    page.theme_mode=ft.ThemeMode.LIGHT
+    page.title="Gestor de Notas Sena"
+    
     page.add(principal(page))
     
 
 print("ejecutando")
-# Ejecuta la aplicación
-
 ft.app(target=main)
-
 print("finalizada")
 

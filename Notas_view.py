@@ -1,8 +1,8 @@
 import flet as ft
 from Config_view import Config_view
 from layouts.PanelContainer import PanelContainer
-from layouts.NotasFormContainer import Form
-from layouts.NotasTableContainer import DataTable
+from layouts.Notas.NotasFormContainer import Form
+from layouts.Notas.NotasTableContainer import DataTable
 from controllers.DataController import DataController
 
 class Notas_view(PanelContainer):
@@ -11,8 +11,7 @@ class Notas_view(PanelContainer):
         self.page = page
 
         # Inicializar el controlador de datos y la tabla de datos una vez
-        self.dataController = None
-        self.tableData = DataTable(self.dataController)
+        
         
         self.initialize_components()
         
@@ -29,12 +28,22 @@ class Notas_view(PanelContainer):
                         ft.IconButton(
                             icon=ft.icons.UPDATE,
                             on_click=lambda _: self.setDataTable()
-                            )]),
+                            ),
+                        ft.IconButton(
+                            icon=ft.icons.ADD,
+                            on_click=lambda _: self.showInfoEviModal()
+                        ),
+                        ft.IconButton(
+                            icon=ft.icons.SAVE,
+                            on_click=lambda _: self.showOptionDialog("Desea guardar los cambios?",self.exportData,icon=ft.icons.INFO)
+                        )]),
                     group_alignment=-0.9,
                     destinations=[ft.NavigationRailDestination(disabled=True)]
                 ),
                 ft.VerticalDivider(width=1),
-                ft.Column([self.fr,self.tableData], alignment=ft.MainAxisAlignment.START, expand=True),
+                ft.Column([
+                    self.tableData
+                           ], alignment=ft.MainAxisAlignment.START, expand=True),
             ],
             expand=True
             )
@@ -42,34 +51,51 @@ class Notas_view(PanelContainer):
         self.setDataTable()
 
     def initialize_components(self):
-        self.config_panel = Config_view(self.page)
-        self.fr = Form()
+        self.dataController = None
+        self.tableData = DataTable(self.page,self.dataController)
+        self.fr = Form(self.page,self.dataController,self.tableData)
+
+        self.tableData.setForm(self.fr)
+
         col = ft.Column(expand=True)
         self.content = col
 
 
-    def setDataTable(self):
-        # Configura el DataController con los valores actuales
-        self.showAlertDialog("Error!! Panel Notas", self.page.session.get("p1"), ft.icons.ERROR)
+    def showInfoEviModal(self):
+        self.showErrorMsg()
+        self.showSuccessMsg()
+        self.fr.clear_data() 
+        self.fr.showModalDialog()
+
+    def exportData(self):
+
+        band = self.dataController.exportDataFrame()
+
+        if(band):
+            self.showAlertDialog("OK","Cambios Guardados Correctamente!", ft.icons.THUMB_UP)
+
+        else:
+            self.showAlertDialog("Error!","no se pudo Guardar los Cambios", ft.icons.ERROR)
+
         
+    def setDataTable(self):
+
         self.dataController = DataController(
-            ruta=self.config_panel.txt_ruta_archivo.value,
-            extencion=self.config_panel.txt_extencion.value
+            ruta=self.page.session.get("rutaArchivo")
+
         )
 
-        # Verifica si se han configurado correctamente los valores de ruta y extensión
-        if self.config_panel.getRuta() != "" or self.config_panel.getExtencion() != "":
+        if self.page.session.get("rutaArchivo") != "" and self.page.session.get("visibleColumns") != [] and self.page.session.get("RutaOrigen") != "" :
+
             if not self.dataController.read_file():
                 self.tableData.clearData()
                 self.showAlertDialog("Error!! Panel Notas", "No se pudo cargar la información", ft.icons.ERROR)
             else:
                 # Actualiza el DataTable existente en lugar de crear uno nuevo
                 self.tableData.dataController = self.dataController
+                self.fr.dataController = self.dataController
                 self.tableData.setDataTable()
                 self.showAlertDialog("Mensaje!! Panel Notas", "Información cargada correctamente", ft.icons.THUMB_UP)
-
-
-
-
-
+        else:
+            self.showAlertDialog("Error!! Panel Notas", "actualice panel de configuraciones", ft.icons.ERROR)
 

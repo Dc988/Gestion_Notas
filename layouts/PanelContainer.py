@@ -3,6 +3,18 @@ import flet as ft
 class PanelContainer(ft.Container):
    def __init__(self, **kwargs):
       super().__init__(**kwargs)
+
+      self.textError = ft.Text(color=ft.colors.RED)
+      self.error = ft.Row(expand=True,wrap=False, visible=False, controls=[
+               ft.Icon(ft.icons.ERROR,color=ft.colors.RED),
+               self.textError
+      ])
+
+      self.textSuccess = ft.Text(color=ft.colors.GREEN)
+      self.success = ft.Row(expand=True,wrap=False, visible=False, controls=[
+               ft.Icon(ft.icons.THUMB_UP,color=ft.colors.GREEN),
+               self.textSuccess
+      ])
       
    def showAlertDialog(self,title:str,content:str,icon:ft.icons=None):
       try:
@@ -32,6 +44,8 @@ class PanelContainer(ft.Container):
          
          self.close_alert(e)
       
+      content.controls.extend([self.error,self.success])
+
       self.modal = ft.AlertDialog(
          modal=True,
          title= ft.Text(title,size=15,weight="bold"),
@@ -42,6 +56,8 @@ class PanelContainer(ft.Container):
          ft.TextButton("Aceptar", on_click=onYesOption,data=self.modal),
          ft.TextButton("Cancelar", on_click=onNoOption,data=self.modal),
       ]
+      self.page.overlay.append(self.modal)  # Asegúrate de que se agregue al árbol de la página.
+
 
    def showModalDialog(self):
       try:
@@ -51,13 +67,40 @@ class PanelContainer(ft.Container):
          pass
       
 
-      
+   def showErrorMsg(self, text=None):
+      if(text!=None):
+         self.error.visible = True
+         self.textError.value = text
+      else:
+         self.error.visible = False
+         self.textError.value = ""
 
-   def showOptionDialog(self,title,YesOption,icon:ft.icons=None):
-      
-      def onYesOption(e):
-         YesOption()
+      if self.error.page is not None:
+         self.error.update()
+         self.textError.update()
+
+   def showSuccessMsg(self, text=None):
+      if(text!=None):
+         self.success.visible = True
+         self.textSuccess.value = text
+      else:
+         self.success.visible = False
+         self.textSuccess.value = ""
+
+      if self.success.page is not None:
+         self.success.update()
+         self.textSuccess.update()
+
+   def showOptionDialog(self,title,YesOption,NoOption=None,icon:ft.icons=None,data=None):
+      def onNoOption(e):
+         if NoOption !=None:
+            NoOption()
          self.close_alert(e)
+
+      def onYesOption(e):
+         YesOption(data) if data is not None else YesOption()
+         self.close_alert(e)
+
       
       self.dlg_modal = ft.AlertDialog(
          modal=True,
@@ -66,8 +109,8 @@ class PanelContainer(ft.Container):
          actions_alignment=ft.MainAxisAlignment.END)
       
       self.dlg_modal.actions=[
-         ft.TextButton("Aceptar", on_click=onYesOption,data=self.dlg_modal),
-         ft.TextButton("Cancelar", on_click=self.close_alert,data=self.dlg_modal),
+         ft.TextButton("Aceptar", on_click=onYesOption, data = self.dlg_modal),
+         ft.TextButton("Cancelar", on_click=onNoOption, data = self.dlg_modal),
       ]
 
       self.page.open(self.dlg_modal)
@@ -93,11 +136,11 @@ class PanelContainer(ft.Container):
    def close_alert(self, e):
         self.page.close(e.control.data)
    
-   def component_container(self,expand:int|bool, name:str, control=None,trailing=None,icon=None):
+   def component_container(self,expand:bool, name:str, control=None,trailing=None,icon=None):
         return ft.Container(
             expand=expand,
             
-            bgcolor="#ebebeb",
+            bgcolor="white10",
             border_radius=6,
             padding=8,
             content=ft.CupertinoListTile(
@@ -107,3 +150,15 @@ class PanelContainer(ft.Container):
                 subtitle=control,
                 trailing=trailing)
         )
+   
+   def textfield(self):
+      return ft.TextField(
+         border_color="transparent",
+         height=20,
+         text_size=13,
+         content_padding=0,
+         cursor_color="black",
+         cursor_width=1,
+         cursor_height=18,
+         color="black"
+      )
