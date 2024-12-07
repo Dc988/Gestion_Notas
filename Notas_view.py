@@ -59,6 +59,8 @@ class Notas_view(PanelContainer):
         col = ft.Column(expand=True)
         self.content = col
 
+    def okis(self):
+        print(1)
 
     def showInfoEviModal(self):
         self.showErrorMsg()

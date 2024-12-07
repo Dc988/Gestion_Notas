@@ -187,7 +187,8 @@ class Header(PanelContainer):
                             text_size=14,
                             content_padding=0,
                             cursor_color="white",
-                            hint_text="Search"
+                            hint_text="Search",
+                            on_submit=self.btn_filter_datatable
                         )
         btn_filter = ft.IconButton(
                             icon=ft.icons.SEARCH_ROUNDED,

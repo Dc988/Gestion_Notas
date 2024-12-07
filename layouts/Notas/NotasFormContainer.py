@@ -158,9 +158,7 @@ class Form(PanelContainer):
             self.fase_txt .value=="" or
             self.actividad_txt .value=="" or
             self.cod_act_txt .value=="" or
-            self.evid_txt .value=="" or
-            self.fecha_txt .value=="" or
-            self.nota_txt .value==""):
+            self.evid_txt .value=="" ):
                 self.showBottomSheetMsg("Campos obligatorios!!!",ft.icons.INFO)
         else:
             
