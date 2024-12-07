@@ -163,13 +163,13 @@ class Form(PanelContainer):
         else:
             
             self.data = {
-                "FASE":self.fase_txt .value,
-                "ACTIVIDAD":self.actividad_txt .value,
-                "CODIGO ACTIVIDAD":self.cod_act_txt .value,
-                "EVIDENCIA":self.evid_txt .value,
-                "FECHA":self.fecha_txt .value,
-                "NOTA":self.nota_txt .value,
-                "OBSERVACION":self.observacion_txt .value,
+                "FASE":self.fase_txt .value.upper(),
+                "ACTIVIDAD":self.actividad_txt .value.upper(),
+                "CODIGO ACTIVIDAD":self.cod_act_txt .value.upper(),
+                "EVIDENCIA":self.evid_txt .value.upper(),
+                "FECHA":self.fecha_txt .value.upper(),
+                "NOTA":self.nota_txt .value.upper(),
+                "OBSERVACION":self.observacion_txt .value.upper(),
                 "IMPORTANTE":"SI"  if self.impr_check.value else "NO"
             }
 

@@ -51,7 +51,8 @@ class DataTable(PanelContainer):
                 self.setTableColumns()
                 self.header.add_items_combobox()
                 
-                data = self.dataController.getData()
+                data = self.dataController.getData() if self.header.filterData == {} else self.dataController.setFilter(self.header.filterData)
+
                 if(data is not None):
                     self.fill_items(data)
                 else:
