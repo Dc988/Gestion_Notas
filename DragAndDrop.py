@@ -41,9 +41,9 @@ class editDataframe_view(PanelContainer):
                     expand=False,
                     name="Ruta Archivo Información",
                     control=self.txt_ruta_archivo,
-                    icon =ft.icons.DRIVE_FILE_MOVE_SHARP,
+                    icon =ft.Icons.DRIVE_FILE_MOVE_SHARP,
                     trailing=ft.IconButton(
-                                icon=ft.icons.ADD,
+                                icon=ft.Icons.ADD,
                                 on_click=lambda _:self.pick_file_dialogArchivo.pick_files(
                                     allow_multiple=False,allowed_extensions=["xlsx"]
                                 )
@@ -52,7 +52,7 @@ class editDataframe_view(PanelContainer):
                 self.component_container(
                     expand=False,
                     name="Columnas del Archivo",
-                    icon =ft.icons.GRID_3X3,
+                    icon =ft.Icons.GRID_3X3,
                     control=ft.Row(
                         controls =[
                             self.dragglePanel,
@@ -94,7 +94,7 @@ class editDataframe_view(PanelContainer):
 
         if(not self.selectedCols):
 
-            self.showBottomSheetMsg("Seleccione al menos una columna!!!",ft.icons.ERROR)
+            self.showBottomSheetMsg("Seleccione al menos una columna!!!",ft.Icons.ERROR)
             band = False
             
         if self.onYes !=None:
@@ -197,7 +197,7 @@ class editDataframe_view(PanelContainer):
             )
 
             if not self.dataController.read_file():
-                self.showBottomSheetMsg("Error!!, No se pudo cargar la información",ft.icons.ERROR)
+                self.showBottomSheetMsg("Error!!, No se pudo cargar la información",ft.Icons.ERROR)
             else:
                 data = self.dataController.getDataByColumns(['FASE', 'ACTIVIDAD', 'CODIGO ACTIVIDAD', 'EVIDENCIA', 'FECHA', 'NOTA', 'OBSERVACION'])   
 
@@ -219,6 +219,6 @@ class editDataframe_view(PanelContainer):
                     if self.dragTarget.page:
                         self.dragTarget.update()
                 else:
-                    self.showBottomSheetMsg("Columnas no coinciden FASE, ACTIVIDAD, CODIGO ACTIVIDAD, EVIDENCIA, FECHA, NOTA, OBSERVACION",ft.icons.ERROR)
+                    self.showBottomSheetMsg("Columnas no coinciden FASE, ACTIVIDAD, CODIGO ACTIVIDAD, EVIDENCIA, FECHA, NOTA, OBSERVACION",ft.Icons.ERROR)
        
                     

@@ -18,25 +18,25 @@ class Config_view(PanelContainer):
             self.pick_file_dialogCarpeta,
             self.component_container(expand=False,name="Ruta Archivo Información",
                                      control=self.txt_ruta_archivo,
-                                    icon =ft.icons.DRIVE_FILE_MOVE_SHARP,
+                                    icon =ft.Icons.DRIVE_FILE_MOVE_SHARP,
                                      trailing=ft.IconButton(
-                                                    icon=ft.icons.ADD,
+                                                    icon=ft.Icons.ADD,
                                                     on_click=lambda _:self.editColModal.showModalDialog()
                                                     #lambda _: self.pick_file_dialogArchivo.pick_files(
                                                     #    allow_multiple=False,allowed_extensions=["xlsx"]
                                                     #)
                                                 )),
                      
-            self.component_container(expand=False,name="Columnas Visibles",control=self.txt_cols_visible,trailing=None,icon=ft.icons.FILE_COPY_ROUNDED),
+            self.component_container(expand=False,name="Columnas Visibles",control=self.txt_cols_visible,trailing=None,icon=ft.Icons.FILE_COPY_ROUNDED),
             self.component_container(expand=False,name="Ruta Carpeta Evidencias",control=self.txt_ruta_carpeta,trailing=ft.IconButton(
-                            icon=ft.icons.ADD,
+                            icon=ft.Icons.ADD,
                             on_click=lambda _: self.pick_file_dialogCarpeta.get_directory_path(),
-                        ),icon=ft.icons.DRIVE_FILE_MOVE_SHARP),            
+                        ),icon=ft.Icons.DRIVE_FILE_MOVE_SHARP),            
                        
             ft.Row([
                 ft.ElevatedButton(
                         "GUARDAR CAMBIOS",
-                        icon=ft.icons.SAVE,
+                        icon=ft.Icons.SAVE,
                         on_click=self.save_data
                     )],alignment="end")
             
@@ -78,10 +78,10 @@ class Config_view(PanelContainer):
             self.showAlertDialog(
                 title="Mensaje!", 
                 content="Datos Guardados Correctamente!", 
-                icon=ft.icons.CHECK) if data else self.showAlertDialog(
+                icon=ft.Icons.CHECK) if data else self.showAlertDialog(
                 title="Error!", 
                 content="No se pudo guardar la informacion!", 
-                icon=ft.icons.ERROR)
+                icon=ft.Icons.ERROR)
             self.set_Data()
             
 
@@ -89,11 +89,11 @@ class Config_view(PanelContainer):
             self.showAlertDialog(
                 title="Error!", 
                 content="No se permiten campos en blanco!", 
-                icon=ft.icons.ERROR)
+                icon=ft.Icons.ERROR)
         else:
             self.showOptionDialog(
                     title="Deseas Guardar esta informació?", 
-                    icon=ft.icons.QUESTION_MARK,
+                    icon=ft.Icons.QUESTION_MARK,
                     YesOption=yesAction)
             
     def set_Data(self):
@@ -111,7 +111,7 @@ class Config_view(PanelContainer):
             self.page.session.set("visibleColumns",data.get("visibleColumns"))
         else:
             self.editColModal = editDataframe_view(self.page, onYes=self.setDataColumn)
-            self.showAlertDialog("Error! Panel Configuraciones","No se pudo cargar información del archivo!",ft.icons.ERROR)
+            self.showAlertDialog("Error! Panel Configuraciones","No se pudo cargar información del archivo!",ft.Icons.ERROR)
             
     def setDataColumn(self):
         self.txt_ruta_archivo.value = self.editColModal.ruta

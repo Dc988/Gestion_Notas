@@ -1,10 +1,10 @@
 {
-    "rutaArchivo": "C:\\Users\\dicma\\Documents\\PROYECTOS\\Seguimiento de notas.xlsx",
+    "rutaArchivo": "G:\\Mi unidad\\1. Documentos\\1. CURSOS\\2. ANALISIS Y DESARROLLO DE SOFTWARE. (2898288)\\02. PROYECTO\\Seguimiento de notas.xlsx",
     "visibleColumns": [
         "EVIDENCIA",
         "FECHA",
         "NOTA",
-        "IMPORTANTE"
+        "OBSERVACION"
     ],
     "RutaOrigen": "G:\\Mi unidad\\1. Documentos\\1. CURSOS\\2. ANALISIS Y DESARROLLO DE SOFTWARE. (2898288)\\02. PROYECTO"
 }

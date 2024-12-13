@@ -22,13 +22,13 @@ class principal(TapContainer):
         self.add_Panel(
             text="Configuraciones",
             target=self.config_panel,
-            icon=ft.icons.SETTINGS)
+            icon=ft.Icons.SETTINGS)
 
         self.nota_panel = Notas_view(self.page)
         self.add_Panel(
             text="Notas",
             target=self.nota_panel,
-            icon=ft.icons.NOTES)
+            icon=ft.Icons.NOTES)
         
 
 def main(page:ft.Page):

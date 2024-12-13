@@ -1,4 +1,5 @@
 import flet as ft
+
 from layouts.PanelContainer import PanelContainer
 
 class DataTable(PanelContainer):
@@ -51,7 +52,7 @@ class DataTable(PanelContainer):
                 self.setTableColumns()
                 self.header.add_items_combobox()
                 
-                data = self.dataController.getData() if self.header.filterData == {} else self.dataController.setFilter(self.header.filterData)
+                data = self.dataController.getData(self.header.filterData)
 
                 if(data is not None):
                     self.fill_items(data)
@@ -76,10 +77,28 @@ class DataTable(PanelContainer):
         self.clearData()
         self.table_cols= self.page.session.get("visibleColumns")
 
-        cols = [ft.DataColumn(ft.Text("#",size=12,color="black", weight="bold"))]
+        cols = [ft.DataColumn(ft.Row([
+            ft.Text("#",size=12,color="black", weight="bold"),
+            ft.IconButton(
+                icon=ft.Icons.ARROW_DROP_DOWN,
+                data=[False,"index"],
+                on_click=self.order_column
+            )
+        ],expand=True,alignment=ft.MainAxisAlignment.SPACE_BETWEEN))]
 
 
-        cols.extend([ft.DataColumn(ft.Text(col,size=12,color="black", weight="bold")) for col in self.table_cols])
+        cols.extend([
+            ft.DataColumn(
+                ft.Row([
+                    ft.Text(col,size=12,color="black", weight="bold"),
+                    ft.IconButton(
+                        icon=ft.Icons.ARROW_DROP_DOWN,
+                        data=[False,col],
+                        on_click=self.order_column
+                    )
+                ],expand=True,alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
+            ) for col in self.table_cols
+        ])
 
         cols.append( ft.DataColumn(ft.Text("",size=12,color="black", weight="bold")))
         
@@ -97,14 +116,23 @@ class DataTable(PanelContainer):
         else:
             print("none data")
 
+    def order_column(self,e):
+        btn = e.control
+        order, column = btn.data
+        
+        btn.icon = ft.Icons.ARROW_DROP_DOWN if order else ft.Icons.ARROW_DROP_UP
+        btn.data = [not order,column]
+        btn.update() if btn.page else None
+
+
     def delete_row(self,index):
 
         band = self.dataController.drop_row(index)
         if band:
-            self.showAlertDialog(title="",content="Registro eliminado",icon=ft.icons.THUMB_UP)
+            self.showAlertDialog(title="",content="Registro eliminado",icon=ft.Icons.THUMB_UP)
             self.setDataTable()
         else:
-            self.showAlertDialog(title="Error",content="No se pudo eliminar el registro",icon=ft.icons.ERROR)
+            self.showAlertDialog(title="Error",content="No se pudo eliminar el registro",icon=ft.Icons.ERROR)
 
 
     def fill_items(self,data):
@@ -122,14 +150,14 @@ class DataTable(PanelContainer):
                             expand=True, 
                             controls=[
                                 ft.IconButton(
-                                    icon=ft.icons.EDIT,
+                                    icon=ft.Icons.EDIT,
                                     icon_color=ft.colors.AMBER,
                                     on_click=lambda e, data=index: self.edit_row(e,data)
                                 ),
                                 ft.IconButton(
-                                    icon=ft.icons.DELETE,
+                                    icon=ft.Icons.DELETE,
                                     icon_color=ft.colors.RED,
-                                    on_click=lambda e, data=index: self.showOptionDialog("Desea eliminar este registro?",self.delete_row,ft.icons.INFO,data=data)
+                                    on_click=lambda e, data=index: self.showOptionDialog("Desea eliminar este registro?",self.delete_row,ft.Icons.INFO,data=data)
                                 )
                             ]
                         )
@@ -192,7 +220,7 @@ class Header(PanelContainer):
                             on_submit=self.btn_filter_datatable
                         )
         btn_filter = ft.IconButton(
-                            icon=ft.icons.SEARCH_ROUNDED,
+                            icon=ft.Icons.SEARCH_ROUNDED,
                             on_click=self.btn_filter_datatable,
                             icon_size=15    
                         )
@@ -252,7 +280,7 @@ class Header(PanelContainer):
                                     width=20,
                                     height=20,
                                     padding=2,
-                                    icon=ft.icons.CLOSE,
+                                    icon=ft.Icons.CLOSE,
                                     
                                     on_click=lambda e,target=content, data=[key,item]: delete_filter(e,target,data)
                                     )
@@ -286,7 +314,7 @@ class Header(PanelContainer):
             self.filter_datatable()
             self.update()
         else:
-            self.showAlertDialog("Error!","ingrese un valor al filtrar", ft.icons.ERROR)
+            self.showAlertDialog("Error!","ingrese un valor al filtrar", ft.Icons.ERROR)
 
     def add_items_combobox(self):
         self.fiter_combobox.options = [ft.dropdown.Option(item) for item in self.datatable.dataController.getColumns()]

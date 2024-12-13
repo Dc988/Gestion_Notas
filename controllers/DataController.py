@@ -6,73 +6,82 @@ class DataController():
         nombre, extension = os.path.splitext(ruta)
         self.ruta_archivo = ruta
         self.extencion = extension
+        self._document = None
+        self.data = None
  
         
     def read_file(self):
         try:
-            self.document = None
+            self._document = None
             
             match(self.extencion):
                 case ".xlsx":
-                    self.document = pd.read_excel(self.ruta_archivo,dtype=str,header=0)
+                    self._document = pd.read_excel(self.ruta_archivo,dtype=str,header=0)
                 case ".csv":
-                    self.document = pd.read_csv(self.ruta_archivo,sep=";")
+                    self._document = pd.read_csv(self.ruta_archivo,sep=";")
                 case _:
                     pass
             self.initializeFrame()       
         except Exception as e:
             print(self.__class__,"read_file",e)
 
-        return False if self.document is None else True
+        return False if self._document is None else True
 
     def initializeFrame(self):
-        if self.document is not None:
-            self.document.fillna("--", inplace=True)
-            self.document.sort_index(ascending=False,inplace=True)
+        if self._document is not None:
+            self._document.fillna("--", inplace=True)
+            self._document.sort_index(ascending=False,inplace=True)
 
+    def setDataFrame(self):
+        self.data = self._document
+        return self
+        
     def getColumns(self):
-        return self.document.columns
+        data = self.getData()
+
+        return data.columns
     
     def getData(self):
-        self.initializeFrame()
-        return self.document
+        
+        return self._document if self.data is None else self.data
     
-    def getDataByColumns(self,colums):
-        data = None
+    def selectColumns(self,colums):
+        data = self.getData()
         
         try:
             self.initializeFrame()
-            data = self.document[colums]
+            self.data = data[colums]
         except Exception as ex:
             print(self.__class__,"getDataByColumns",ex)
 
-        return data
+        return self
     
     def setFilter(self, filter: dict):
-        data = None
-        if self.document is not None:
+        data = self.getData()
+        if data is not None:
             try:
-                self.initializeFrame()
-                data = self.document
                 for columna, valores in filter.items():
                     data = data[data[columna].astype(str).str.startswith(tuple(valores), na=True)]
+                self.data = data
             except Exception as e:
                 print(self.__class__, "setFilter", e)
-        return data
+        return self
 
     
 
     def getLen(self):
+        data = self.getData()
         lenData = -1
-        if self.document is not None:
-            lenData = len(self.document)
+        if data is not None:
+            lenData = len(data)
 
         return lenData
     
     def getRow(self,index):
         try:
-            data = None
-            data = self.document.loc[index] 
+            data = self.getData()
+
+            data = data.loc[index] 
 
         except Exception as e:
             print(self.__class__,"getRow",e)
@@ -85,7 +94,7 @@ class DataController():
             index = -1
             if(self.getLen()>=0):
                 index = self.getLen()
-                self.document.loc[index] = row
+                self._document.loc[index] = row
                 band = True
 
         except Exception as e:
@@ -99,7 +108,7 @@ class DataController():
 
     def edit_row(self,index:int,row:dict):
         try:
-            self.document.loc[index] = row
+            self._document.loc[index] = row
 
         except Exception as e:
             print(self.__class__,"edit_row",e)
@@ -108,7 +117,7 @@ class DataController():
         
     def drop_row(self, index:int):
         try:
-            self.document = self.document.drop(index).reset_index(drop=True)
+            self._document = self._document.drop(index).reset_index(drop=True)
 
         except Exception as e:
             print(self.__class__,"drop_row",e)
@@ -117,7 +126,7 @@ class DataController():
     
     def exportDataFrame(self):
         try:
-            self.document.to_excel(self.ruta_archivo, sheet_name="Hoja 1", index = False)
+            self._document.to_excel(self.ruta_archivo, sheet_name="Hoja 1", index = False)
             band = True
             
         except Exception as e:
@@ -127,3 +136,12 @@ class DataController():
         return band
 
 
+print("Empezando")
+d = DataController( "c:\\Users\\dicma\\Documents\\Seguimiento de notas.xlsx")
+
+if (d.read_file()):
+    data = d.setDataFrame().getData()
+
+    print(data)
+else:
+    print("error")

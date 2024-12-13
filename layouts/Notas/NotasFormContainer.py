@@ -34,11 +34,11 @@ class Form(PanelContainer):
                     min_extended_width=400,
                     leading=ft.Column([
                             ft.IconButton(
-                                icon=ft.icons.PICTURE_AS_PDF,
+                                icon=ft.Icons.PICTURE_AS_PDF,
                                 on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\Guia_aprendizaje.pdf")
                             ),
                             ft.IconButton(
-                                icon=ft.icons.FILE_COPY,
+                                icon=ft.Icons.FILE_COPY,
                                 on_click=lambda _:self.copy_file_evi(origen="Format.docx",
                                                                      to=f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}\\{self.evid_txt.value}\\{self.evid_txt.value}.docx")
                             )
@@ -54,26 +54,26 @@ class Form(PanelContainer):
                                 self.component_container(
                                     expand=True,name="FASE",
                                     control=self.fase_txt,
-                                    icon =ft.icons.TEXT_FIELDS,
+                                    icon =ft.Icons.TEXT_FIELDS,
                                     trailing=ft.IconButton(
-                                        icon=ft.icons.FOLDER,
+                                        icon=ft.Icons.FOLDER,
                                         on_click= lambda _: self.open_os(self.fase_txt.value)
                                     )),
                                 self.component_container(
                                     expand=True,name="ACTIVIDAD",
                                     control=self.actividad_txt,
-                                    icon =ft.icons.TEXT_FIELDS,
+                                    icon =ft.Icons.TEXT_FIELDS,
                                     trailing=ft.IconButton(
-                                        icon=ft.icons.FOLDER,
+                                        icon=ft.Icons.FOLDER,
                                         on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}")
                                     )),
                             
                                 self.component_container(
                                     expand=True,name="CODIGO ACTIVIDAD",
                                     control=self.cod_act_txt,
-                                    icon =ft.icons.CODE,
+                                    icon =ft.Icons.CODE,
                                     trailing=ft.IconButton(
-                                        icon=ft.icons.FOLDER,
+                                        icon=ft.Icons.FOLDER,
                                         on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}")
                                     )),
                             ]),
@@ -81,9 +81,9 @@ class Form(PanelContainer):
                                 self.component_container(
                                     expand=True,name="EVIDENCIA",
                                     control=self.evid_txt,
-                                    icon =ft.icons.BOOK,
+                                    icon =ft.Icons.BOOK,
                                     trailing=ft.IconButton(
-                                        icon=ft.icons.FOLDER,
+                                        icon=ft.Icons.FOLDER,
                                         on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}\\{self.evid_txt.value}")
                                     )),
                             ]),
@@ -92,14 +92,14 @@ class Form(PanelContainer):
                                 self.component_container(
                                     expand=True,name="NOTA",
                                     control=self.nota_txt,
-                                    icon =ft.icons.NOTES),
+                                    icon =ft.Icons.NOTES),
 
                                 self.component_container(
                                     expand=True,name="FECHA",
                                     control=self.fecha_txt,
-                                    icon =ft.icons.CALENDAR_MONTH,
+                                    icon =ft.Icons.CALENDAR_MONTH,
                                     trailing=ft.IconButton(
-                                        icon=ft.icons.REMOVE_RED_EYE,
+                                        icon=ft.Icons.REMOVE_RED_EYE,
                                         on_click=lambda _:self.page.open(
                                             self.dt
                                         )
@@ -108,13 +108,13 @@ class Form(PanelContainer):
                                 self.component_container(
                                     expand=True,name="IMPORTANTE",
                                     control=self.impr_check,
-                                    icon =ft.icons.LABEL_IMPORTANT),
+                                    icon =ft.Icons.LABEL_IMPORTANT),
                             ]),
                             ft.Row(controls=[
                                 self.component_container(
                                             expand=True,name="OBSERVACION",
                                             control=self.observacion_txt,
-                                            icon =ft.icons.MENU_OPEN),
+                                            icon =ft.Icons.MENU_OPEN),
                                 ])                                
                             
                     ]
@@ -159,7 +159,7 @@ class Form(PanelContainer):
             self.actividad_txt .value=="" or
             self.cod_act_txt .value=="" or
             self.evid_txt .value=="" ):
-                self.showBottomSheetMsg("Campos obligatorios!!!",ft.icons.INFO)
+                self.showBottomSheetMsg("Campos obligatorios!!!",ft.Icons.INFO)
         else:
             
             self.data = {
@@ -181,7 +181,7 @@ class Form(PanelContainer):
             if (self.dataTable is not None):
                 self.dataTable.setDataTable()
             else:
-                self.showBottomSheetMsg("Error!!! no se pudo actualizar la tabla",ft.icons.ERROR)
+                self.showBottomSheetMsg("Error!!! no se pudo actualizar la tabla",ft.Icons.ERROR)
 
 
         
@@ -219,9 +219,9 @@ class Form(PanelContainer):
             index = self.index_txt.value
             resp = self.dataController.edit_row(index,self.data)
             if(resp):
-                self.showBottomSheetMsg("Registro editado!",ft.icons.THUMB_UP)
+                self.showBottomSheetMsg("Registro editado!",ft.Icons.THUMB_UP)
             else:
-                self.showBottomSheetMsg("Error!!! no se pudo editado el registro",ft.icons.ERROR)
+                self.showBottomSheetMsg("Error!!! no se pudo editado el registro",ft.Icons.ERROR)
         else:
             print("edit datacontroller null")
 
@@ -232,9 +232,9 @@ class Form(PanelContainer):
             resp, index = self.dataController.add_row(self.data)
             if(resp):
                 self.index_txt.value = index
-                self.showBottomSheetMsg("Registro añadido!",ft.icons.THUMB_UP)
+                self.showBottomSheetMsg("Registro añadido!",ft.Icons.THUMB_UP)
             else:
-                self.showBottomSheetMsg("Error!!! no se pudo agrear el registro",ft.icons.ERROR)
+                self.showBottomSheetMsg("Error!!! no se pudo agrear el registro",ft.Icons.ERROR)
         else:
             print("save datacontroller null")
 
@@ -243,7 +243,7 @@ class Form(PanelContainer):
 
         if(os.path.exists(ruta)):
             os.startfile(ruta)
-            self.showBottomSheetMsg("Abriendo Ruta",ft.icons.THUMB_UP)
+            self.showBottomSheetMsg("Abriendo Ruta",ft.Icons.THUMB_UP)
         else:
             self.showBottomSheetOption("Ruta no existe, desea crear una?",lambda r = ruta: self.create_folder(r))
 
@@ -251,9 +251,9 @@ class Form(PanelContainer):
         try:
             os.makedirs(ruta)
             os.startfile(ruta)
-            self.showBottomSheetMsg("Abriendo Ruta",ft.icons.THUMB_UP)
+            self.showBottomSheetMsg("Abriendo Ruta",ft.Icons.THUMB_UP)
         except Exception as ex:
-            self.showBottomSheetMsg("Error al crear la carpeta",ft.icons.ERROR)
+            self.showBottomSheetMsg("Error al crear la carpeta",ft.Icons.ERROR)
             print(ex)
 
 
@@ -274,19 +274,19 @@ class Form(PanelContainer):
         def copy():
             if (os.path.exists(origen)):
                 if(os.path.exists(to)):
-                    self.showBottomSheetMsg(f"Ya hay un formato creado",ft.icons.INFO)
+                    self.showBottomSheetMsg(f"Ya hay un formato creado",ft.Icons.INFO)
                 else:
                     try:
                         sh.copy(origen, to)
-                        self.showBottomSheetMsg("Archivo creado correctamente",ft.icons.INFO)
+                        self.showBottomSheetMsg("Archivo creado correctamente",ft.Icons.INFO)
                     except Exception as e:
-                        self.showBottomSheetMsg("Error! No se pudo crear el Archivo",ft.icons.ERROR)
+                        self.showBottomSheetMsg("Error! No se pudo crear el Archivo",ft.Icons.ERROR)
                         print(e)
 
 
 
             else:
-                self.showBottomSheetMsg(f"Plantilla no existe",ft.icons.ERROR)
+                self.showBottomSheetMsg(f"Plantilla no existe",ft.Icons.ERROR)
 
             
         origen = f"{self.page.session.get("RutaOrigen")}\\{origen}"

@@ -25,16 +25,16 @@ class Notas_view(PanelContainer):
                     min_extended_width=400,
                     leading=ft.Column([
                         ft.IconButton(
-                            icon=ft.icons.UPDATE,
+                            icon=ft.Icons.UPDATE,
                             on_click=lambda _: self.setDataTable()
                             ),
                         ft.IconButton(
-                            icon=ft.icons.ADD,
+                            icon=ft.Icons.ADD,
                             on_click=lambda _: self.showInfoEviModal()
                         ),
                         ft.IconButton(
-                            icon=ft.icons.SAVE,
-                            on_click=lambda _: self.showOptionDialog("Desea guardar los cambios?",self.exportData,icon=ft.icons.INFO)
+                            icon=ft.Icons.SAVE,
+                            on_click=lambda _: self.showOptionDialog("Desea guardar los cambios?",self.exportData,icon=ft.Icons.INFO)
                         )]),
                     group_alignment=-0.9,
                     destinations=[ft.NavigationRailDestination(disabled=True)]
@@ -73,10 +73,10 @@ class Notas_view(PanelContainer):
         band = self.dataController.exportDataFrame()
 
         if(band):
-            self.showAlertDialog("OK","Cambios Guardados Correctamente!", ft.icons.THUMB_UP)
+            self.showAlertDialog("OK","Cambios Guardados Correctamente!", ft.Icons.THUMB_UP)
 
         else:
-            self.showAlertDialog("Error!","no se pudo Guardar los Cambios", ft.icons.ERROR)
+            self.showAlertDialog("Error!","no se pudo Guardar los Cambios", ft.Icons.ERROR)
 
         
     def setDataTable(self):
@@ -90,15 +90,15 @@ class Notas_view(PanelContainer):
 
             if not self.dataController.read_file():
                 self.tableData.clearData()
-                self.showAlertDialog("Error!! Panel Notas", "No se pudo cargar la información", ft.icons.ERROR)
+                self.showAlertDialog("Error!! Panel Notas", "No se pudo cargar la información", ft.Icons.ERROR)
             else:
                 # Actualiza el DataTable existente en lugar de crear uno nuevo
                 self.tableData.dataController = self.dataController
                 self.fr.dataController = self.dataController
                 self.tableData.setDataTable()
-                self.showAlertDialog("Mensaje!! Panel Notas", "Información cargada correctamente", ft.icons.THUMB_UP)
+                self.showAlertDialog("Mensaje!! Panel Notas", "Información cargada correctamente", ft.Icons.THUMB_UP)
         else:
-            self.showAlertDialog("Error!! Panel Notas", "actualice panel de configuraciones", ft.icons.ERROR)
+            self.showAlertDialog("Error!! Panel Notas", "actualice panel de configuraciones", ft.Icons.ERROR)
 
 
 

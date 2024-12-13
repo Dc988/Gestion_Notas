@@ -11,17 +11,17 @@ class PanelContainer(ft.Container):
 
       self.textError = ft.Text(color=ft.colors.RED)
       self.error = ft.Row(expand=True,wrap=False, visible=False, controls=[
-               ft.Icon(ft.icons.ERROR,color=ft.colors.RED),
+               ft.Icon(ft.Icons.ERROR,color=ft.colors.RED),
                self.textError
       ])
 
       self.textSuccess = ft.Text(color=ft.colors.GREEN)
       self.success = ft.Row(expand=True,wrap=False, visible=False, controls=[
-               ft.Icon(ft.icons.THUMB_UP,color=ft.colors.GREEN),
+               ft.Icon(ft.Icons.THUMB_UP,color=ft.colors.GREEN),
                self.textSuccess
       ])
       
-   def showBottomSheetMsg(self,text:str,icon:ft.icons=None):
+   def showBottomSheetMsg(self,text:str,icon:ft.Icons=None):
       try:
          self.bsmsg = ft.BottomSheet(
       
@@ -70,14 +70,14 @@ class PanelContainer(ft.Container):
       self.bs.content.content.controls=[
                     ft.Text(text,size=15,weight=ft.FontWeight.BOLD),
                     ft.Row([
-                        ft.ElevatedButton("Cancelar",icon =ft.icons.CLOSE,icon_color=ft.colors.RED, on_click=onNoOption,data=self.bs),
-                        ft.ElevatedButton("Aceptar",icon =ft.icons.CHECK,icon_color=ft.colors.GREEN, on_click=onYesOption,data=self.bs)
+                        ft.ElevatedButton("Cancelar",icon =ft.Icons.CLOSE,icon_color=ft.colors.RED, on_click=onNoOption,data=self.bs),
+                        ft.ElevatedButton("Aceptar",icon =ft.Icons.CHECK,icon_color=ft.colors.GREEN, on_click=onYesOption,data=self.bs)
                     ],alignment=ft.MainAxisAlignment.SPACE_BETWEEN)                    
                 ]
       self.page.open(self.bs)
 
 
-   def showAlertDialog(self,title:str,content:str,icon:ft.icons=None):
+   def showAlertDialog(self,title:str,content:str,icon:ft.Icons=None):
       try:
          self.alert = ft.AlertDialog(
             title= ft.Text(title),
@@ -154,7 +154,7 @@ class PanelContainer(ft.Container):
          self.success.update()
          self.textSuccess.update()
 
-   def showOptionDialog(self,title,YesOption,NoOption=None,icon:ft.icons=None,data=None):
+   def showOptionDialog(self,title,YesOption,NoOption=None,icon:ft.Icons=None,data=None):
       def onNoOption(e):
          if NoOption !=None:
             NoOption()
@@ -181,15 +181,15 @@ class PanelContainer(ft.Container):
    def defineIcon(self,icon):
       
       match(icon):
-         case ft.icons.WARNING:
+         case ft.Icons.WARNING:
               color = ft.colors.AMBER
-         case ft.icons.INFO:
+         case ft.Icons.INFO:
             color = ft.colors.BLUE
-         case ft.icons.CHECK:
+         case ft.Icons.CHECK:
             color = ft.colors.GREEN
-         case ft.icons.ERROR:
+         case ft.Icons.ERROR:
             color = ft.colors.RED
-         case ft.icons.THUMB_UP:
+         case ft.Icons.THUMB_UP:
             color = ft.colors.GREEN
          case _:
             color= None
