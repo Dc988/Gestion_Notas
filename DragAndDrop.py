@@ -199,7 +199,7 @@ class editDataframe_view(PanelContainer):
             if not self.dataController.read_file():
                 self.showBottomSheetMsg("Error!!, No se pudo cargar la información",ft.Icons.ERROR)
             else:
-                data = self.dataController.getDataByColumns(['FASE', 'ACTIVIDAD', 'CODIGO ACTIVIDAD', 'EVIDENCIA', 'FECHA', 'NOTA', 'OBSERVACION'])   
+                data = self.dataController.selectColumns(['FASE', 'ACTIVIDAD', 'CODIGO ACTIVIDAD', 'EVIDENCIA', 'FECHA', 'NOTA', 'OBSERVACION'])   
 
                 if(data is not None):
                     columns =self.dataController.getColumns()

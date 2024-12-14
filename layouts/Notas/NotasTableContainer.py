@@ -52,8 +52,9 @@ class DataTable(PanelContainer):
                 self.setTableColumns()
                 self.header.add_items_combobox()
                 
-                data = self.dataController.getData(self.header.filterData)
-
+                self.dataController.setDataFrame()
+                self.dataController.setFilter(self.header.filterData)
+                data = self.dataController.getData()
                 if(data is not None):
                     self.fill_items(data)
                 else:
@@ -120,9 +121,19 @@ class DataTable(PanelContainer):
         btn = e.control
         order, column = btn.data
         
+        self.dataController.setDataFrame()
+        self.dataController.setFilter(self.header.filterData)
+        self.dataController.setOrder(order, column)
+
+        data = self.dataController.getData()
+
         btn.icon = ft.Icons.ARROW_DROP_DOWN if order else ft.Icons.ARROW_DROP_UP
         btn.data = [not order,column]
         btn.update() if btn.page else None
+
+        if(data is not None):
+            self.fill_items(data)
+
 
 
     def delete_row(self,index):
@@ -150,8 +161,8 @@ class DataTable(PanelContainer):
                             expand=True, 
                             controls=[
                                 ft.IconButton(
-                                    icon=ft.Icons.EDIT,
-                                    icon_color=ft.colors.AMBER,
+                                    icon=ft.Icons.REMOVE_RED_EYE,
+                                    icon_color=ft.colors.GREEN,
                                     on_click=lambda e, data=index: self.edit_row(e,data)
                                 ),
                                 ft.IconButton(
@@ -292,10 +303,10 @@ class Header(PanelContainer):
         
     def filter_datatable(self):
         
-        data = self.datatable.dataController.setFilter(
-            self.filterData
-        )
-        
+        self.datatable.dataController.setDataFrame()
+        self.datatable.dataController.setFilter(self.filterData)
+        data = self.datatable.dataController.getData()
+
         if(data is not None):
             self.datatable.fill_items(data)
         else:

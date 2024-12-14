@@ -38,8 +38,10 @@ class DataController():
         
     def getColumns(self):
         data = self.getData()
-
-        return data.columns
+        col =None
+        if data is not None:
+            col = data.columns
+        return col
     
     def getData(self):
         
@@ -47,12 +49,12 @@ class DataController():
     
     def selectColumns(self,colums):
         data = self.getData()
-        
-        try:
-            self.initializeFrame()
-            self.data = data[colums]
-        except Exception as ex:
-            print(self.__class__,"getDataByColumns",ex)
+        if data is not None:
+            try:
+                self.initializeFrame()
+                self.data = data[colums]
+            except Exception as ex:
+                print(self.__class__,"selectColumns",ex)
 
         return self
     
@@ -67,7 +69,16 @@ class DataController():
                 print(self.__class__, "setFilter", e)
         return self
 
-    
+    def setOrder(self,order:bool, column:str):
+        data = self.getData()
+        if data is not None:
+            
+            if column.upper() == "INDEX":
+                data.sort_index(ascending=order,inplace=True)
+            else:
+                data.sort_values(by=column.upper(),ascending=order,inplace=True)
+        return self
+
 
     def getLen(self):
         data = self.getData()
@@ -135,13 +146,16 @@ class DataController():
             band = False
         return band
 
-
+""""
 print("Empezando")
 d = DataController( "c:\\Users\\dicma\\Documents\\Seguimiento de notas.xlsx")
+filter = {
+    
+}
 
 if (d.read_file()):
-    data = d.setDataFrame().getData()
-
-    print(data)
+    data = d.setDataFrame().setFilter(filter).setOrder(True,"Nota").getData()
+    for index,row in data.iterrows():
+        print(index)
 else:
-    print("error")
+    print("error")"""
