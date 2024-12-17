@@ -162,12 +162,12 @@ class DataTable(PanelContainer):
                             controls=[
                                 ft.IconButton(
                                     icon=ft.Icons.REMOVE_RED_EYE,
-                                    icon_color=ft.colors.GREEN,
+                                    icon_color=ft.Colors.GREEN,
                                     on_click=lambda e, data=index: self.edit_row(e,data)
                                 ),
                                 ft.IconButton(
                                     icon=ft.Icons.DELETE,
-                                    icon_color=ft.colors.RED,
+                                    icon_color=ft.Colors.RED,
                                     on_click=lambda e, data=index: self.showOptionDialog("Desea eliminar este registro?",self.delete_row,ft.Icons.INFO,data=data)
                                 )
                             ]
@@ -214,7 +214,7 @@ class Header(PanelContainer):
                 text_size=12,
                 border_color="transparent",
                 filled=False,
-                focused_bgcolor= ft.colors.RED,
+                focused_bgcolor= ft.Colors.RED,
                 width=120,
                 height=40,
                 content_padding=10,
@@ -280,7 +280,7 @@ class Header(PanelContainer):
                 content =ft.Container(
                     height=50,
                     border=ft.border.all(2,"#E3E3E3"),
-                    bgcolor=ft.colors.WHITE,
+                    bgcolor=ft.Colors.WHITE,
                     border_radius=8,
                     padding=ft.padding.only(left=10),
                     content=ft.Row(spacing=5

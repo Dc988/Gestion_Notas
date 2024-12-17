@@ -115,7 +115,7 @@ class editDataframe_view(PanelContainer):
                 padding=5, 
                 width=300,
                 height=200,
-                bgcolor=ft.colors.WHITE,
+                bgcolor=ft.Colors.WHITE,
                 border=ft.border.all(2,"#E3E3E3"),
                 border_radius=5,
                 alignment=ft.alignment.center,
@@ -191,7 +191,9 @@ class editDataframe_view(PanelContainer):
         self.selectedCols = data
         
     def InitializeData(self):
-       if self.ruta!=None:
+       
+        self.showLoadingSheetMsg() if self.modal.open else None
+        if self.ruta!=None:
             self.dataController = DataController(
                 ruta=self.ruta
             )
@@ -199,6 +201,7 @@ class editDataframe_view(PanelContainer):
             if not self.dataController.read_file():
                 self.showBottomSheetMsg("Error!!, No se pudo cargar la información",ft.Icons.ERROR)
             else:
+
                 data = self.dataController.selectColumns(['FASE', 'ACTIVIDAD', 'CODIGO ACTIVIDAD', 'EVIDENCIA', 'FECHA', 'NOTA', 'OBSERVACION'])   
 
                 if(data is not None):
@@ -218,6 +221,7 @@ class editDataframe_view(PanelContainer):
                         self.dragglePanel.update()
                     if self.dragTarget.page:
                         self.dragTarget.update()
+                    self.closeLoadingSheetMsg()
                 else:
                     self.showBottomSheetMsg("Columnas no coinciden FASE, ACTIVIDAD, CODIGO ACTIVIDAD, EVIDENCIA, FECHA, NOTA, OBSERVACION",ft.Icons.ERROR)
        

@@ -154,6 +154,8 @@ class Form(PanelContainer):
         self.fecha_txt.update() if self.fecha_txt.page else None
 
     def onYesOption(self):
+        self.showLoadingSheetMsg()
+
         if(
             self.fase_txt .value=="" or
             self.actividad_txt .value=="" or
@@ -239,6 +241,7 @@ class Form(PanelContainer):
             print("save datacontroller null")
 
     def open_os(self,value):
+        self.showLoadingSheetMsg()
         ruta = f"{self.page.session.get("RutaOrigen")}\\{value}"
 
         if(os.path.exists(ruta)):
@@ -246,9 +249,11 @@ class Form(PanelContainer):
             self.showBottomSheetMsg("Abriendo Ruta",ft.Icons.THUMB_UP)
         else:
             self.showBottomSheetOption("Ruta no existe, desea crear una?",lambda r = ruta: self.create_folder(r))
+        self.closeLoadingSheetMsg()
 
     def create_folder(self,ruta):
         try:
+            self.showLoadingSheetMsg()
             os.makedirs(ruta)
             os.startfile(ruta)
             self.showBottomSheetMsg("Abriendo Ruta",ft.Icons.THUMB_UP)
@@ -273,6 +278,8 @@ class Form(PanelContainer):
     def copy_file_evi(self,origen, to):
         def copy():
             if (os.path.exists(origen)):
+                self.showLoadingSheetMsg()
+
                 if(os.path.exists(to)):
                     self.showBottomSheetMsg(f"Ya hay un formato creado",ft.Icons.INFO)
                 else:

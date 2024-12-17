@@ -12,7 +12,6 @@ class Notas_view(PanelContainer):
 
         # Inicializar el controlador de datos y la tabla de datos una vez
         
-        
         self.initialize_components()
         self.content.controls = [
             ft.Row(
@@ -59,17 +58,12 @@ class Notas_view(PanelContainer):
         col = ft.Column(expand=True)
         self.content = col
 
-    def okis(self):
-        print(1)
-
     def showInfoEviModal(self):
-        self.showErrorMsg()
-        self.showSuccessMsg()
         self.fr.clear_data() 
         self.fr.showModalDialog()
 
     def exportData(self):
-
+        self.showLoadingDialog()
         band = self.dataController.exportDataFrame()
 
         if(band):
@@ -77,10 +71,11 @@ class Notas_view(PanelContainer):
 
         else:
             self.showAlertDialog("Error!","no se pudo Guardar los Cambios", ft.Icons.ERROR)
+        self.closeLoadingDialog()
 
         
     def setDataTable(self):
-
+        self.showLoadingDialog()
         self.dataController = DataController(
             ruta=self.page.session.get("rutaArchivo")
 
@@ -99,6 +94,6 @@ class Notas_view(PanelContainer):
                 self.showAlertDialog("Mensaje!! Panel Notas", "Información cargada correctamente", ft.Icons.THUMB_UP)
         else:
             self.showAlertDialog("Error!! Panel Notas", "actualice panel de configuraciones", ft.Icons.ERROR)
-
+        self.closeLoadingDialog()
 
 

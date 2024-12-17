@@ -3,28 +3,52 @@ import flet as ft
 class PanelContainer(ft.Container):
    def __init__(self, **kwargs):
       super().__init__(**kwargs)
+
       self.dlg_modal=None
-      self.bs =None
       self.modal = None
       self.alert = None
+      self.loadAlert = ft.AlertDialog(
+         modal=True,
+         title=ft.Text("",size=20,no_wrap=False,weight=ft.FontWeight.BOLD),
+         content=ft.Row([ft.ProgressRing(),ft.Text("Cargando...",size=20,no_wrap=False,weight=ft.FontWeight.BOLD)])
+      )
+   
+      self.bs =None
       self.bsmsg =None
+      self.bslmsg = ft.BottomSheet(
+         dismissible=False,
+         content=ft.Container(
+               bgcolor="#f2f0f0",
+               padding=50,
+               border_radius=6,
+               content=ft.Column(
+                  tight=True,
+                  controls=[ft.Row([ft.ProgressRing(),ft.Text("Cargando...",size=20,no_wrap=False,weight=ft.FontWeight.BOLD)])]
+               ),
+         ),
+      )
 
-      self.textError = ft.Text(color=ft.colors.RED)
-      self.error = ft.Row(expand=True,wrap=False, visible=False, controls=[
-               ft.Icon(ft.Icons.ERROR,color=ft.colors.RED),
-               self.textError
-      ])
 
-      self.textSuccess = ft.Text(color=ft.colors.GREEN)
-      self.success = ft.Row(expand=True,wrap=False, visible=False, controls=[
-               ft.Icon(ft.Icons.THUMB_UP,color=ft.colors.GREEN),
-               self.textSuccess
-      ])
-      
+   def showLoadingSheetMsg(self):
+      try:
+
+         
+         self.page.open(self.bslmsg)
+      except Exception:
+         pass
+
+   def closeLoadingSheetMsg(self):
+      try:        
+         if ((self.bslmsg is not None) and self.bslmsg.visible):
+            self.page.close(self.bslmsg)
+      except Exception:
+         pass
+
    def showBottomSheetMsg(self,text:str,icon:ft.Icons=None):
       try:
+         self.closeLoadingSheetMsg()
          self.bsmsg = ft.BottomSheet(
-      
+         
          content=ft.Container(
                bgcolor="#f2f0f0",
                padding=50,
@@ -39,8 +63,6 @@ class PanelContainer(ft.Container):
       except Exception:
          pass
 
-
-      pass
    def showBottomSheetOption(self,text:str,YesOption:callable=None,NoOption:callable =None):
       def onYesOption(e):
          if YesOption is not None:
@@ -54,6 +76,8 @@ class PanelContainer(ft.Container):
             NoOption()
          
          self.close_alert(e)
+
+      self.closeLoadingSheetMsg()
 
       self.bs = ft.BottomSheet(
         dismissible=False,
@@ -70,12 +94,25 @@ class PanelContainer(ft.Container):
       self.bs.content.content.controls=[
                     ft.Text(text,size=15,weight=ft.FontWeight.BOLD),
                     ft.Row([
-                        ft.ElevatedButton("Cancelar",icon =ft.Icons.CLOSE,icon_color=ft.colors.RED, on_click=onNoOption,data=self.bs),
-                        ft.ElevatedButton("Aceptar",icon =ft.Icons.CHECK,icon_color=ft.colors.GREEN, on_click=onYesOption,data=self.bs)
+                        ft.ElevatedButton("Cancelar",icon =ft.Icons.CLOSE,icon_color=ft.Colors.RED, on_click=onNoOption,data=self.bs),
+                        ft.ElevatedButton("Aceptar",icon =ft.Icons.CHECK,icon_color=ft.Colors.GREEN, on_click=onYesOption,data=self.bs)
                     ],alignment=ft.MainAxisAlignment.SPACE_BETWEEN)                    
                 ]
       self.page.open(self.bs)
 
+
+   def showLoadingDialog(self):
+      try:
+         self.page.open(self.loadAlert)
+      except Exception as ex:
+         print(self.__class__,"showAlertDialog",ex)
+
+   def closeLoadingDialog(self):
+      try:        
+         if ((self.loadAlert is not None) and self.loadAlert.visible):
+            self.page.close(self.loadAlert)
+      except Exception:
+         pass
 
    def showAlertDialog(self,title:str,content:str,icon:ft.Icons=None):
       try:
@@ -107,7 +144,6 @@ class PanelContainer(ft.Container):
          
          self.close_alert(e)
       
-      content.controls.extend([self.error,self.success])
 
       self.modal = ft.AlertDialog(
          modal=True,
@@ -119,6 +155,7 @@ class PanelContainer(ft.Container):
          ft.TextButton("Aceptar", on_click=onYesOption,data=self.modal),
          ft.TextButton("Cancelar", on_click=onNoOption,data=self.modal),
       ]
+      
       self.page.overlay.append(self.modal)  # Asegúrate de que se agregue al árbol de la página.
 
 
@@ -130,29 +167,7 @@ class PanelContainer(ft.Container):
          pass
       
 
-   def showErrorMsg(self, text=None):
-      if(text!=None):
-         self.error.visible = True
-         self.textError.value = text
-      else:
-         self.error.visible = False
-         self.textError.value = ""
-
-      if self.error.page is not None:
-         self.error.update()
-         self.textError.update()
-
-   def showSuccessMsg(self, text=None):
-      if(text!=None):
-         self.success.visible = True
-         self.textSuccess.value = text
-      else:
-         self.success.visible = False
-         self.textSuccess.value = ""
-
-      if self.success.page is not None:
-         self.success.update()
-         self.textSuccess.update()
+   
 
    def showOptionDialog(self,title,YesOption,NoOption=None,icon:ft.Icons=None,data=None):
       def onNoOption(e):
@@ -182,15 +197,15 @@ class PanelContainer(ft.Container):
       
       match(icon):
          case ft.Icons.WARNING:
-              color = ft.colors.AMBER
+              color = ft.Colors.AMBER
          case ft.Icons.INFO:
-            color = ft.colors.BLUE
+            color = ft.Colors.BLUE
          case ft.Icons.CHECK:
-            color = ft.colors.GREEN
+            color = ft.Colors.GREEN
          case ft.Icons.ERROR:
-            color = ft.colors.RED
+            color = ft.Colors.RED
          case ft.Icons.THUMB_UP:
-            color = ft.colors.GREEN
+            color = ft.Colors.GREEN
          case _:
             color= None
 

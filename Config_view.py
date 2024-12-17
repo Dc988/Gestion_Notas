@@ -22,9 +22,7 @@ class Config_view(PanelContainer):
                                      trailing=ft.IconButton(
                                                     icon=ft.Icons.ADD,
                                                     on_click=lambda _:self.editColModal.showModalDialog()
-                                                    #lambda _: self.pick_file_dialogArchivo.pick_files(
-                                                    #    allow_multiple=False,allowed_extensions=["xlsx"]
-                                                    #)
+                                                    
                                                 )),
                      
             self.component_container(expand=False,name="Columnas Visibles",control=self.txt_cols_visible,trailing=None,icon=ft.Icons.FILE_COPY_ROUNDED),
@@ -51,10 +49,10 @@ class Config_view(PanelContainer):
         self.editColModal = None
         self.col = ft.Column()
         
-        self.txt_ruta_archivo = ft.Text(value="alue",size=15)
-        self.txt_cols_visible = ft.Text(value="alue",size=15)
+        self.txt_ruta_archivo = ft.Text(value="",size=15)
+        self.txt_cols_visible = ft.Text(value="",size=15)
                 
-        self.txt_ruta_carpeta = ft.Text(value="alue",size=15)
+        self.txt_ruta_carpeta = ft.Text(value="",size=15)
         
         self.pick_file_dialogCarpeta = ft.FilePicker(on_result=self.get_directory_result)
 
@@ -67,6 +65,7 @@ class Config_view(PanelContainer):
 
     def save_data(self,e):
         def yesAction():
+            
             data = {
             "rutaArchivo":self.txt_ruta_archivo.value,
             "RutaOrigen":self.txt_ruta_carpeta.value,
@@ -92,7 +91,7 @@ class Config_view(PanelContainer):
                 icon=ft.Icons.ERROR)
         else:
             self.showOptionDialog(
-                    title="Deseas Guardar esta informació?", 
+                    title="Deseas Guardar esta información?", 
                     icon=ft.Icons.QUESTION_MARK,
                     YesOption=yesAction)
             
