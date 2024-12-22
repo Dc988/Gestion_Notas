@@ -1,6 +1,6 @@
 import flet as ft
 import os
-import datetime
+from datetime import datetime
 import shutil as sh
 from layouts.PanelContainer import PanelContainer
 
@@ -143,8 +143,11 @@ class Form(PanelContainer):
         self.nota_txt = self.textfield()
         self.observacion_txt = self.textfield()
         self.impr_check = ft.Checkbox()
+        now = datetime.now()
+
         self.dt = ft.DatePicker(
-                    first_date=datetime.datetime(year=2000, month=1, day=1),
+                    first_date=datetime(year=2000, month=1, day=1),
+                    last_date=datetime(year=now.year, month=now.month, day=now.day),
                     on_change=self.handle_change
                 )
        

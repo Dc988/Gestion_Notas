@@ -96,4 +96,3 @@ class Notas_view(PanelContainer):
             self.showAlertDialog("Error!! Panel Notas", "actualice panel de configuraciones", ft.Icons.ERROR)
         self.closeLoadingDialog()
 
-
