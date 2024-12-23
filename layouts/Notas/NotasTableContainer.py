@@ -16,14 +16,17 @@ class DataTable(PanelContainer):
                 ft.Column(
                     controls=[ft.Row(controls=[ self.table])],
                     scroll=ft.ScrollMode.HIDDEN,  # Habilitar el scroll automático
-                    height=520,
-                    expand=True)
+                    height=450,
+                    expand=True),
+                self.footer
                     ]
     def setForm(self,fr):
         self.form = fr
 
     def initialize_components(self):
         self.header = Header(self)
+        self.footer = Footer(self)
+
         col = ft.Column(expand=True)
         self.content = col
 
@@ -150,11 +153,13 @@ class DataTable(PanelContainer):
 
         if data is not None:
             data = data[self.table_cols]
+            self.footer.setSize(len(data))
+            
             rows=[]
             for index,row in data.iterrows():
                 cell = [ft.DataCell(ft.Text(index,color="black"))]
   
-                cell.extend([ft.DataCell(ft.Text(cell,color="black")) for cell in row])
+                cell.extend([ft.DataCell(ft.Text(cell,color="black",selectable=True)) for cell in row])
                 cell.append(
                     ft.DataCell(
                         content=ft.Row(
@@ -198,7 +203,7 @@ class Header(PanelContainer):
     def __init__(self, dt:DataTable):
 
         header_style={
-            "height" : 70,
+            "height" : 80,
             "bgcolor" : "#ebebeb",
             "border_radius" : ft.border_radius.only(top_left=15,top_right=15),
             "padding":ft.padding.only(left=15,right=15,top=5),
@@ -329,4 +334,75 @@ class Header(PanelContainer):
 
     def add_items_combobox(self):
         self.fiter_combobox.options = [ft.dropdown.Option(item) for item in self.datatable.dataController.getColumns()]
+
+class Footer(PanelContainer):
+    
+    def __init__(self, dt:DataTable):
+
+        header_style={
+            "height" : 60,
+            "bgcolor" : "#ebebeb",
+            "border_radius" : ft.border_radius.only(bottom_left=15,bottom_right=15),
+            "padding":ft.padding.only(left=15,right=15,bottom=5),
+            "margin":ft.margin.only(top=-10,bottom=10)
+        }
+
+        super().__init__(**header_style)
+        self.lenText = ft.Text(value="0" , size=12)
+
+        self.pg = 1
+
+        self.display=ft.Row(alignment=  ft.MainAxisAlignment.END,
+            controls=[])
+        self.content=ft.Row(
+            alignment=  ft.MainAxisAlignment.SPACE_BETWEEN,
+            controls=[self.lenText,self.display]
+        )
+
+    def setSize(self,value):
+        self.lenText.value = value
+        self.lenText.update() if self.lenText.page else None
+        self.setDisplay()
+
+    def setDisplay(self):
+        fin = (self.lenText.value // 10) + 1
+        controls = [
+            ft.IconButton(
+                icon=ft.Icons.ARROW_BACK,
+                on_click=lambda _: self.paginate(page= self.pg if self.pg == 1 else self.pg -1)
+            )
+        ]
+
+        controls.extend([
+            ft.ElevatedButton(text=num,width=25 ,on_click= lambda e: self.paginate(num)) for num in range(1,fin)
+        ])
+
+        controls.append(
+            ft.IconButton(
+                icon=ft.Icons.ARROW_FORWARD,
+                on_click=lambda _: self.paginate(page= self.pg if self.pg == fin else self.pg+1)
+            )
+        )
+    
+        self.display.controls =controls
+        self.display.update() if self.display.page else None
+    
+   
+    def paginate(self,page,cant=10):
+        self.pg=page
+
+        tot = (self.lenText.value // 10)
+
+        ini = (page - 1)*cant
+        
+        fin = self.lenText.value if page==tot else (ini+cant)  
+
+
+        print("page",page)
+        print("range",ini," - ",fin)
+
+
+
+
+
 
