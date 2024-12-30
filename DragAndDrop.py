@@ -64,7 +64,6 @@ class editDataframe_view(PanelContainer):
                         ]
                     )
                 ),
-               
             ]
         )
 

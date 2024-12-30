@@ -1,4 +1,5 @@
 import flet as ft
+from layouts.Notas.FilterTable import FilterTable_view
 
 from layouts.PanelContainer import PanelContainer
 
@@ -51,19 +52,20 @@ class DataTable(PanelContainer):
         
 
     def setDataTable(self):
-        try:
-            if (self.dataController.getData() is not None):
-                self.setTableColumns()
-                self.header.add_items_combobox()
-                
-                self.dataController.setDataFrame()
-                self.dataController.setFilter(self.header.filterData)
-                data = self.dataController.getData()
-                if(data is not None):
-                    self.fill_items(data)
-                else:
-                    print("setDataTable,None data")
-               
+        
+        if (self.dataController.getData() is not None):
+            self.setTableColumns()
+            self.header.filter_view.add_items_combobox_filter(self.dataController.getColumns())
+            
+            self.dataController.setDataFrame()
+            self.dataController.setFilter(self.header.filterData)
+            data = self.dataController.getData()
+            if(data is not None):
+                self.fill_items(data)
+            else:
+                print("setDataTable,None data")
+        try:      
+            pass 
         except Exception as ex:
             print(self.__class__,"setDataTable",ex)
             pass
@@ -187,18 +189,7 @@ class DataTable(PanelContainer):
 
 
 class Header(PanelContainer):
- 
-    def search_bar(self,control):
-        return ft.Container(
-            
-            width=500,
-            bgcolor="white10",
-            border_radius=6,
-            animate_opacity=300,
-            padding=8,
-            content=control
-            )
-    
+     
     def __init__(self, dt:DataTable):
 
         header_style={
@@ -212,46 +203,17 @@ class Header(PanelContainer):
         super().__init__(**header_style)
         self.datatable = dt
         self.filterData ={}
-        self.fiter_combobox = ft.Dropdown(
-                label = "Filtrar por",
-
-                text_size=12,
-                border_color="transparent",
-                filled=False,
-                focused_bgcolor= ft.Colors.RED,
-                width=120,
-                height=40,
-                content_padding=10,
-                options=[],
-            )
-        self.txt_filter = ft.TextField(
-                            border_color="transparent",
-                            height=20,
-                            width=100,
-                            text_size=14,
-                            content_padding=0,
-                            cursor_color="white",
-                            hint_text="Search",
-                            on_submit=self.btn_filter_datatable
-                        )
-        btn_filter = ft.IconButton(
-                            icon=ft.Icons.SEARCH_ROUNDED,
-                            on_click=self.btn_filter_datatable,
-                            icon_size=15    
-                        )
-        
-        self.search_bar = self.search_bar(ft.Row(
-            expand=True,
-            alignment="end",
-            spacing=30,
-            controls=[self.fiter_combobox,self.txt_filter,btn_filter]
-        ))
+        self.filter_view = FilterTable_view(dt.page,onYes=self.btn_filter_datatable)
 
         self.filter = ft.Row(expand=True,spacing=10,alignment=ft.MainAxisAlignment.START)
 
         self.content=ft.Row(
             alignment=  ft.MainAxisAlignment.SPACE_BETWEEN,
-            controls=[self.filter,self.search_bar]
+            controls=[self.filter,
+                      ft.IconButton(
+                        icon=ft.icons.FILTER_ALT_SHARP,
+                        on_click=lambda _: self.filter_view.showModalDialog()
+                    )]
         )
 
     def add_filter_data(self,filterby, value):
@@ -261,9 +223,7 @@ class Header(PanelContainer):
         else:
             self.filterData[filterby] = [value]
             
-        self.txt_filter.value=""
         
-    
     def add_filter_components(self):
         def delete_filter(e,target,data):
             key,item = data
@@ -305,20 +265,16 @@ class Header(PanelContainer):
         self.filter.controls=row
                   
 
-    def btn_filter_datatable(self,e):
-        filterby=self.fiter_combobox.value
-        value = self.txt_filter.value.upper()
-
+    def btn_filter_datatable(self,filterby,option,value):
+       
         if(filterby):
             self.add_filter_data(filterby,value)
             self.add_filter_components()
             self.datatable.setDataTable()
             self.update()
+            print(self.filterData)
         else:
             self.showAlertDialog("Error!","ingrese un valor al filtrar", ft.Icons.ERROR)
-
-    def add_items_combobox(self):
-        self.fiter_combobox.options = [ft.dropdown.Option(item) for item in self.datatable.dataController.getColumns()]
 
 class Footer(PanelContainer):
     

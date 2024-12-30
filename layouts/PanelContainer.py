@@ -33,8 +33,6 @@ class PanelContainer(ft.Container):
 
    def showLoadingSheetMsg(self):
       try:
-
-         
          self.page.open(self.bslmsg)
       except Exception:
          pass
@@ -151,6 +149,7 @@ class PanelContainer(ft.Container):
 
       self.modal = ft.AlertDialog(
          modal=True,
+         
          title= ft.Text(title,size=15,weight="bold"),
          content=content,
          actions_alignment=ft.MainAxisAlignment.END)
@@ -159,7 +158,6 @@ class PanelContainer(ft.Container):
          ft.TextButton("Aceptar", on_click=onYesOption,data=self.modal),
          ft.TextButton("Cancelar", on_click=onNoOption,data=self.modal),
       ]
-      
       self.page.overlay.append(self.modal)  # Asegúrate de que se agregue al árbol de la página.
 
 
