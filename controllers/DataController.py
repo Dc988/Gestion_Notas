@@ -62,7 +62,9 @@ class DataController():
         data = self.getData()
         if data is not None:
             try:
-                for columna, valores in filter.items():
+                for columna, items in filter.items():
+                    tipo = items["TYPE"]
+                    valores = items["VALUES"]
                     data = data[data[columna].astype(str).str.startswith(tuple(valores), na=True)]
                 self.data = data
             except Exception as e:

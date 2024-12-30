@@ -92,9 +92,9 @@ class FilterTable_view(PanelContainer):
         else:
             if self.onYes !=None:
                 
-                self.onYes(filterby=self.fiter_combobox.value
-                            ,option=self.option_combobox.value
-                            ,value=self.txt_filter.value)
+                self.onYes(filterby=self.fiter_combobox.value.upper()
+                            ,option=self.option_combobox.value.upper()
+                            ,value=self.txt_filter.value.upper())
             self.clean_val()
             band=True
 

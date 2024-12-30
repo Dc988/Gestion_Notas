@@ -59,6 +59,7 @@ class DataTable(PanelContainer):
             
             self.dataController.setDataFrame()
             self.dataController.setFilter(self.header.filterData)
+           
             data = self.dataController.getData()
             if(data is not None):
                 self.fill_items(data)
@@ -216,21 +217,25 @@ class Header(PanelContainer):
                     )]
         )
 
-    def add_filter_data(self,filterby, value):
+    def add_filter_data(self,filterby,option, value):
+        
+        
         if filterby in self.filterData:
-            if value not in self.filterData[filterby]:
-                self.filterData[filterby].append(value)  
+            if value not in self.filterData[filterby]["VALUES"]:
+                self.filterData[filterby]["VALUES"].append(value) 
+                self.filterData[filterby]["TYPE"]=option
         else:
-            self.filterData[filterby] = [value]
+            self.filterData[filterby] = {"VALUES":[value],"TYPE":option}
+
             
         
     def add_filter_components(self):
         def delete_filter(e,target,data):
             key,item = data
            
-            self.filterData[key].remove(item)
+            self.filterData[key]["VALUES"].remove(item)
             
-            if not self.filterData[key]:
+            if not self.filterData[key]["VALUES"]:
                 del self.filterData[key]
             self.datatable.setDataTable()
             
@@ -240,7 +245,7 @@ class Header(PanelContainer):
 
         row =[]
         for key,value in self.filterData.items():
-            for item in value :
+            for item in value['VALUES'] :
                 content =ft.Container(
                     height=50,
                     border=ft.border.all(2,"#E3E3E3"),
@@ -268,7 +273,7 @@ class Header(PanelContainer):
     def btn_filter_datatable(self,filterby,option,value):
        
         if(filterby):
-            self.add_filter_data(filterby,value)
+            self.add_filter_data(filterby,option,value)
             self.add_filter_components()
             self.datatable.setDataTable()
             self.update()
