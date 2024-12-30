@@ -1,5 +1,7 @@
 
 import flet as ft
+from time import sleep
+
 class PanelContainer(ft.Container):
    def __init__(self, **kwargs):
       super().__init__(**kwargs)
@@ -40,6 +42,7 @@ class PanelContainer(ft.Container):
    def closeLoadingSheetMsg(self):
       try:        
          if ((self.bslmsg is not None) and self.bslmsg.visible):
+            sleep(3)
             self.page.close(self.bslmsg)
       except Exception:
          pass
@@ -110,6 +113,7 @@ class PanelContainer(ft.Container):
    def closeLoadingDialog(self):
       try:        
          if ((self.loadAlert is not None) and self.loadAlert.visible):
+            sleep(3)
             self.page.close(self.loadAlert)
       except Exception:
          pass
