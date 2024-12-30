@@ -10,7 +10,7 @@ class DataTable(PanelContainer):
         self.form =None
 
         self.initialize_components()
-        self.scroll=ft.ScrollMode.AUTO
+        self.scroll=ft.ScrollMode.ADAPTIVE
         self.content.controls=[
                 self.header,
                 ft.Column(
@@ -30,6 +30,7 @@ class DataTable(PanelContainer):
         col = ft.Column(expand=True)
         self.content = col
 
+        
   
         self.table_cols= []
 
@@ -110,8 +111,6 @@ class DataTable(PanelContainer):
         if self.table.page is not None:
             self.table.update()
 
-
-
     def edit_row(self,e,index):
         data = self.dataController.getRow(index)
 
@@ -137,8 +136,6 @@ class DataTable(PanelContainer):
         if(data is not None):
             self.fill_items(data)
 
-
-
     def delete_row(self,index):
 
         band = self.dataController.drop_row(index)
@@ -148,13 +145,13 @@ class DataTable(PanelContainer):
         else:
             self.showAlertDialog(title="Error",content="No se pudo eliminar el registro",icon=ft.Icons.ERROR)
 
-
     def fill_items(self,data):
 
         if data is not None:
-            data = data[self.table_cols]
             self.footer.setSize(len(data))
-            
+            data = data[self.table_cols]
+            data = data.iloc[self.footer.ini:self.footer.fin]
+      
             rows=[]
             for index,row in data.iterrows():
                 cell = [ft.DataCell(ft.Text(index,color="black"))]
@@ -186,6 +183,8 @@ class DataTable(PanelContainer):
                 self.table.update()
         else:
             print("Data None")
+
+
 
 class Header(PanelContainer):
  
@@ -273,7 +272,7 @@ class Header(PanelContainer):
             
             if not self.filterData[key]:
                 del self.filterData[key]
-            self.filter_datatable()
+            self.datatable.setDataTable()
             
             target.visible=False
             
@@ -304,21 +303,7 @@ class Header(PanelContainer):
                 row.append(content)
 
         self.filter.controls=row
-
-        
-    def filter_datatable(self):
-        
-        self.datatable.dataController.setDataFrame()
-        self.datatable.dataController.setFilter(self.filterData)
-        data = self.datatable.dataController.getData()
-
-        if(data is not None):
-            self.datatable.fill_items(data)
-        else:
-            print("filter_datatable,None data")
-        
-       
-            
+                  
 
     def btn_filter_datatable(self,e):
         filterby=self.fiter_combobox.value
@@ -327,7 +312,7 @@ class Header(PanelContainer):
         if(filterby):
             self.add_filter_data(filterby,value)
             self.add_filter_components()
-            self.filter_datatable()
+            self.datatable.setDataTable()
             self.update()
         else:
             self.showAlertDialog("Error!","ingrese un valor al filtrar", ft.Icons.ERROR)
@@ -349,8 +334,13 @@ class Footer(PanelContainer):
 
         super().__init__(**header_style)
         self.lenText = ft.Text(value="0" , size=12)
-
+        self.dataTable = dt
         self.pg = 1
+        self.rows_per_page=8
+        self.total_page = 0
+        self.size = 0
+        self.ini=0
+        self.fin = self.rows_per_page
 
         self.display=ft.Row(alignment=  ft.MainAxisAlignment.END,
             controls=[])
@@ -360,27 +350,40 @@ class Footer(PanelContainer):
         )
 
     def setSize(self,value):
-        self.lenText.value = value
-        self.lenText.update() if self.lenText.page else None
+        self.size = value
         self.setDisplay()
+        self.lenText.value=f"Página {self.pg} de {self.total_page} - Total {value}"
+        self.lenText.update() if self.lenText.page else None
+        
 
     def setDisplay(self):
-        fin = (self.lenText.value // 10) + 1
+        def btnPage(e):
+            page = e.control.data
+            self.paginate(
+                page=page
+            )
+
+        self.total_page = (self.size // self.rows_per_page)
         controls = [
             ft.IconButton(
                 icon=ft.Icons.ARROW_BACK,
-                on_click=lambda _: self.paginate(page= self.pg if self.pg == 1 else self.pg -1)
+                on_click=lambda _: self.paginate(page= max(1, self.pg - 1))
             )
         ]
 
         controls.extend([
-            ft.ElevatedButton(text=num,width=25 ,on_click= lambda e: self.paginate(num)) for num in range(1,fin)
+            ft.ElevatedButton(text=num,
+                            width=30 ,
+                            data = num,
+                            on_click=btnPage,
+                            bgcolor= ft.colors.GREY if self.pg == num else ft.colors.WHITE,
+            ) for num in range(1,(self.total_page+ 1))
         ])
 
         controls.append(
             ft.IconButton(
                 icon=ft.Icons.ARROW_FORWARD,
-                on_click=lambda _: self.paginate(page= self.pg if self.pg == fin else self.pg+1)
+                on_click=lambda _: self.paginate(page= self.pg if self.pg == self.total_page else self.pg+1)
             )
         )
     
@@ -388,18 +391,16 @@ class Footer(PanelContainer):
         self.display.update() if self.display.page else None
     
    
-    def paginate(self,page,cant=10):
+    def paginate(self,page):
         self.pg=page
 
-        tot = (self.lenText.value // 10)
+        tot = (self.size // self.rows_per_page)
 
-        ini = (page - 1)*cant
+        self.ini = (self.pg - 1)*self.rows_per_page
         
-        fin = self.lenText.value if page==tot else (ini+cant)  
-
-
-        print("page",page)
-        print("range",ini," - ",fin)
+        self.fin = self.size if self.pg==tot else (self.ini+self.rows_per_page)
+        self.dataTable.setDataTable()
+        self.setSize(self.size)
 
 
 
