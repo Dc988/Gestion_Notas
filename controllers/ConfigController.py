@@ -5,13 +5,14 @@ class ConfigController():
         self.archivo = 'controllers/Data_Config.json'
        
     def read_document(self):
+        datos = None
         try:
             with open(self.archivo, 'r', encoding='utf-8') as f:
                 datos = json.load(f)
-            return datos
         except Exception as e:
             print(self.__class__,"read_document",e)
-            return None
+            
+        return datos
     
     def edit_json(self,data):
         datos = self.read_document()

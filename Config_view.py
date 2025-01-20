@@ -2,7 +2,9 @@ import flet as ft
 from controllers.ConfigController import ConfigController
 from layouts.PanelContainer import PanelContainer
 from DragAndDrop import editDataframe_view
-import os
+from controllers.DataController import DataController
+import pandas as pd
+
 
 class Config_view(PanelContainer):
     _instance = None
@@ -14,18 +16,21 @@ class Config_view(PanelContainer):
         self.initialize_components()     
         
         self.col.controls=[
-            #self.pick_file_dialogArchivo,
+            self.pick_file_dialogArchivo,
+            self.save_file_dialogArchivo,
             self.pick_file_dialogCarpeta,
-            self.component_container(expand=False,name="Ruta Archivo Información",
-                                     control=self.txt_ruta_archivo,
-                                    icon =ft.Icons.DRIVE_FILE_MOVE_SHARP,
-                                     trailing=ft.IconButton(
+            ft.Row(controls=[
+                ft.ElevatedButton(text="Importar",on_click=lambda _:self.pick_file_dialogArchivo.pick_files(
+                                    allow_multiple=False,allowed_extensions=["xlsx"]
+                                )),
+                ft.ElevatedButton(text="Exportar",on_click=lambda _:self.save_file_dialogArchivo.save_file(file_name="Seguimiento de notas.xlsx",allowed_extensions=["xlsx"]))
+            ],alignment=ft.MainAxisAlignment.END),
+                     
+            self.component_container(expand=False,name="Columnas Visibles",control=self.txt_cols_visible,icon=ft.Icons.FILE_COPY_ROUNDED,trailing=ft.IconButton(
                                                     icon=ft.Icons.ADD,
                                                     on_click=lambda _:self.editColModal.showModalDialog()
                                                     
                                                 )),
-                     
-            self.component_container(expand=False,name="Columnas Visibles",control=self.txt_cols_visible,trailing=None,icon=ft.Icons.FILE_COPY_ROUNDED),
             self.component_container(expand=False,name="Ruta Carpeta Evidencias",control=self.txt_ruta_carpeta,trailing=ft.IconButton(
                             icon=ft.Icons.ADD,
                             on_click=lambda _: self.pick_file_dialogCarpeta.get_directory_path(),
@@ -39,17 +44,16 @@ class Config_view(PanelContainer):
                     )],alignment="end")
             
             ]
-               
-    def clear(self,e):
-         self.txt_ruta_archivo.value = ""
-         self.txt_ruta_archivo.update()
+            
          
     def initialize_components(self):
+        self.pick_file_dialogArchivo = ft.FilePicker(on_result=self.pick_file_result)
+        self.save_file_dialogArchivo = ft.FilePicker(on_result=self.save_file_result)
+        ft.FilePicker()
         self.configController = ConfigController()
         self.editColModal = None
         self.col = ft.Column()
         
-        self.txt_ruta_archivo = ft.Text(value="",size=15)
         self.txt_cols_visible = ft.Text(value="",size=15)
                 
         self.txt_ruta_carpeta = ft.Text(value="",size=15)
@@ -67,7 +71,6 @@ class Config_view(PanelContainer):
         def yesAction():
             
             data = {
-            "rutaArchivo":self.txt_ruta_archivo.value,
             "RutaOrigen":self.txt_ruta_carpeta.value,
             "visibleColumns":self.editColModal.selectedCols
             }
@@ -84,7 +87,7 @@ class Config_view(PanelContainer):
             self.set_Data()
             
 
-        if (self.txt_ruta_archivo.value == "") or (self.txt_ruta_carpeta.value == "") or (not self.editColModal.selectedCols):
+        if (self.txt_ruta_carpeta.value == "") or (not self.editColModal.selectedCols):
             self.showAlertDialog(
                 title="Error!", 
                 content="No se permiten campos en blanco!", 
@@ -99,23 +102,24 @@ class Config_view(PanelContainer):
         data = self.configController.read_document()
         
         if(data):
-            self.editColModal = editDataframe_view(self.page,data.get("rutaArchivo"), onYes=self.setDataColumn)
-            self.txt_ruta_archivo.value=data.get("rutaArchivo")
+            self.editColModal = editDataframe_view(self.page, onYes=self.setDataColumn)
+            
             self.txt_ruta_carpeta.value=data.get("RutaOrigen")
             self.txt_cols_visible.value= ", ".join(data.get("visibleColumns"))
-            self.editColModal.setData(data.get("visibleColumns"))
             
             self.page.session.set("rutaArchivo",data.get("rutaArchivo"))
             self.page.session.set("RutaOrigen",data.get("RutaOrigen"))
             self.page.session.set("visibleColumns",data.get("visibleColumns"))
+            self.page.session.set("col_oblig",data.get("col_oblig"))
+            self.editColModal.setData(data.get("visibleColumns"))
+
         else:
             self.editColModal = editDataframe_view(self.page, onYes=self.setDataColumn)
             self.showAlertDialog("Error! Panel Configuraciones","No se pudo cargar información del archivo!",ft.Icons.ERROR)
             
     def setDataColumn(self):
-        self.txt_ruta_archivo.value = self.editColModal.ruta
+        
         self.txt_cols_visible.value= ", ".join(self.editColModal.selectedCols)
-        self.txt_ruta_archivo.update()
         self.txt_cols_visible.update()
       
 
@@ -124,13 +128,56 @@ class Config_view(PanelContainer):
         self.txt_ruta_carpeta.value = e.path if e.path else self.txt_ruta_carpeta.value
         self.txt_ruta_carpeta.update()
     
-    def getRuta(self):
-        return self.txt_ruta_archivo.value
-    
-    
     def getRutaCarpeta(self):
         return self.txt_ruta_carpeta.value
     
+    def save_file_result(self,e: ft.FilePickerResultEvent):
+        def save():
+            self.showLoadingDialog()
+            temp = DataController()
+            band = temp.exportDataFrame(e.path)
+            data = {
+                "title":"Accion exitosa" if band else "Ocurrio un error!",
+                "content":"Datos importados" if band else "No se pudo importar la informacion",
+                "icon": ft.Icons.THUMB_UP if band else ft.Icons.ERROR
+            }
+
+            self.showAlertDialog(**data)
+        
+        self.showOptionDialog("Desea exportar la informacion?",YesOption=save,icon=ft.Icons.INFO_ROUNDED) if e.path is not None else None
+
+            
+
+    def pick_file_result(self,e: ft.FilePickerResultEvent):
+        def save():
+            self.showLoadingDialog()
+            temp = DataController()
+            band = temp.importDataFrame(ruta)
+            data = {
+                "title":"Accion exitosa" if band else "Ocurrio un error!",
+                "content":"Datos importados" if band else "No se pudo importar la informacion",
+                "icon": ft.Icons.THUMB_UP if band else ft.Icons.ERROR
+            }
+
+            self.showAlertDialog(**data)
+            
+        try:
+            if e.files:
+                self.showLoadingDialog()
+                ruta = (
+                    ", ".join(map(lambda f: f.path, e.files)) if e.files else ""
+                )
+                col = self.page.session.get("col_oblig")
+                dt = pd.read_excel(ruta,dtype=str,header=0)
+                dt = dt[col]
+
+                self.showOptionDialog("Desea importar la informacion?",YesOption=save,icon=ft.Icons.INFO_ROUNDED) 
+        except Exception as ex:
+            self.showAlertDialog("Error","No se pudo importar el archivo!",ft.Icons.ERROR)
+            print(ex)
+
+
+
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = super(Config_view, cls).__new__(cls)

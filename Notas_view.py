@@ -63,7 +63,7 @@ class Notas_view(PanelContainer):
 
     def exportData(self):
         self.showLoadingDialog()
-        band = self.dataController.exportDataFrame()
+        band = self.dataController.saveDataFile()
 
         if(band):
             self.showAlertDialog("OK","Cambios Guardados Correctamente!", ft.Icons.THUMB_UP)
@@ -75,10 +75,7 @@ class Notas_view(PanelContainer):
         
     def setDataTable(self):
         self.showLoadingDialog()
-        self.dataController = DataController(
-            ruta=self.page.session.get("rutaArchivo")
-
-        )
+        self.dataController = DataController()
 
         if self.page.session.get("rutaArchivo") != "" and self.page.session.get("visibleColumns") != [] and self.page.session.get("RutaOrigen") != "" :
 

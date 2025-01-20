@@ -178,7 +178,8 @@ class PanelContainer(ft.Container):
          self.close_alert(e)
 
       def onYesOption(e):
-         YesOption(data) if data is not None else YesOption()
+         if YesOption !=None:
+            YesOption(data) if data is not None else YesOption()
          self.close_alert(e)
 
       

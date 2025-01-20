@@ -61,7 +61,8 @@ class DataTable(PanelContainer):
             self.dataController.setFilter(self.header.filterData)
            
             data = self.dataController.getData()
-            if(data is not None):
+
+            if(len(data)):
                 self.fill_items(data)
             else:
                 print("setDataTable,None data")
@@ -173,7 +174,7 @@ class DataTable(PanelContainer):
                                 ft.IconButton(
                                     icon=ft.Icons.DELETE,
                                     icon_color=ft.Colors.RED,
-                                    on_click=lambda e, data=index: self.showOptionDialog("Desea eliminar este registro?",self.delete_row,ft.Icons.INFO,data=data)
+                                    on_click=lambda e, data=index: self.showOptionDialog(title="Desea eliminar este registro?",YesOption=self.delete_row,icon=ft.Icons.INFO,data=data)
                                 )
                             ]
                         )
@@ -219,7 +220,6 @@ class Header(PanelContainer):
 
     def add_filter_data(self,filterby,option, value):
         
-        
         if filterby in self.filterData:
             if value not in self.filterData[filterby]["VALUES"]:
                 self.filterData[filterby]["VALUES"].append(value) 
@@ -230,7 +230,9 @@ class Header(PanelContainer):
             
         
     def add_filter_components(self):
-        def delete_filter(e,target,data):
+        
+
+        def delete_filter(target,data):
             key,item = data
            
             self.filterData[key]["VALUES"].remove(item)
@@ -252,9 +254,11 @@ class Header(PanelContainer):
                     bgcolor=ft.Colors.WHITE,
                     border_radius=8,
                     padding=ft.padding.only(left=10),
+                    
                     content=ft.Row(spacing=5
                                 ,controls=[ft.Column([ft.Text(key,size=11, weight="bold"),ft.Text(f" {item}",size=10)],spacing=0)])
                 )
+
                 btn = ft.IconButton(
                                     icon_size=12,
                                     width=20,
@@ -262,7 +266,7 @@ class Header(PanelContainer):
                                     padding=2,
                                     icon=ft.Icons.CLOSE,
                                     
-                                    on_click=lambda e,target=content, data=[key,item]: delete_filter(e,target,data)
+                                    on_click=lambda e,target=content, data=[key,item]: delete_filter(target,data)
                                     )
                 content.content.controls.append(btn)
                 row.append(content)
@@ -312,6 +316,7 @@ class Footer(PanelContainer):
 
     def setSize(self,value):
         self.size = value
+        
         self.setDisplay()
         self.lenText.value=f"Página {self.pg} de {self.total_page} - Total {value}"
         self.lenText.update() if self.lenText.page else None

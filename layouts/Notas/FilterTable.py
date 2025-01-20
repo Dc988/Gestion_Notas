@@ -25,7 +25,7 @@ class FilterTable_view(PanelContainer):
                 filled=False,
                 focused_bgcolor= ft.Colors.RED,
                 height=40,
-                width=150,
+                width=200,
                 content_padding=10,
                 options=[],
             )
@@ -46,7 +46,7 @@ class FilterTable_view(PanelContainer):
         self.txt_filter = ft.TextField(
                             border_color="#e0e0e0",
                             height=40,
-                            width=200,      
+                            width=230,      
 
                             text_size=14,
                             content_padding=10,
@@ -56,7 +56,7 @@ class FilterTable_view(PanelContainer):
         col = ft.Row(
             expand=True,
             spacing=10,
-            width=520,
+            width=600,
             controls=[
                 self.fiter_combobox,
                 self.option_combobox,
@@ -80,6 +80,17 @@ class FilterTable_view(PanelContainer):
         self.option_combobox.value =""
         self.txt_filter.value =""
 
+    def setData(self,filterby,option,value):
+        self.fiter_combobox.value = filterby
+        self.fiter_combobox.update() if self.fiter_combobox.page else None
+
+        self.option_combobox.value = option
+        self.option_combobox.update() if self.option_combobox.page else None
+
+        self.txt_filter.value = value
+        self.txt_filter.update() if self.txt_filter.page else None
+
+        
     def guardar(self):
         
         band = True
