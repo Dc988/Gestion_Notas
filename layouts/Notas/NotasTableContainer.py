@@ -9,7 +9,7 @@ class DataTable(PanelContainer):
         super().__init__()
         self.page = page
         self.form =None
-
+        self.orderBy=[False,"index"]
         self.initialize_components()
         self.scroll=ft.ScrollMode.ADAPTIVE
         self.content.controls=[
@@ -57,9 +57,12 @@ class DataTable(PanelContainer):
             self.setTableColumns()
             self.header.filter_view.add_items_combobox_filter(self.dataController.getColumns())
             
+            order, column = self.orderBy
+
             self.dataController.setDataFrame()
+            self.dataController.setOrder(order, column)
             self.dataController.setFilter(self.header.filterData)
-           
+
             data = self.dataController.getData()
 
             if(len(data)):
@@ -125,8 +128,10 @@ class DataTable(PanelContainer):
 
     def order_column(self,e):
         btn = e.control
-        order, column = btn.data
         
+        order, column = btn.data
+        self.orderBy = btn.data
+
         self.dataController.setDataFrame()
         self.dataController.setFilter(self.header.filterData)
         self.dataController.setOrder(order, column)
@@ -367,9 +372,3 @@ class Footer(PanelContainer):
         self.fin = self.size if self.pg==tot else (self.ini+self.rows_per_page)
         self.dataTable.setDataTable()
         self.setSize(self.size)
-
-
-
-
-
-

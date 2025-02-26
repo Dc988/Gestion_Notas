@@ -172,7 +172,7 @@ class Form(PanelContainer):
                 "ACTIVIDAD":self.actividad_txt .value.upper(),
                 "CODIGO ACTIVIDAD":self.cod_act_txt .value.upper(),
                 "EVIDENCIA":self.evid_txt .value.upper(),
-                "FECHA":self.fecha_txt .value.upper(),
+                "FECHA": "NO HECHO" if self.fecha_txt.value =="" else self.fecha_txt .value.upper(),
                 "NOTA":self.nota_txt .value.upper(),
                 "OBSERVACION":self.observacion_txt .value.upper(),
                 "IMPORTANTE":"SI"  if self.impr_check.value else "NO"

@@ -73,11 +73,12 @@ class FilterTable_view(PanelContainer):
 
     def add_items_combobox_option(self, opt):
         self.option_combobox.options = [ft.dropdown.Option(item) for item in opt]
+        self.option_combobox.value = opt[0]
         self.option_combobox.update() if self.option_combobox.page else None
 
     def clean_val(self):
         self.fiter_combobox.value = ""
-        self.option_combobox.value =""
+        self.option_combobox.value ="igual a"
         self.txt_filter.value =""
 
     def setData(self,filterby,option,value):
