@@ -328,6 +328,7 @@ class Form(PanelContainer):
                     try:
                         sh.copy(origen, to)
                         self.showBottomSheetMsg("Archivo creado correctamente",ft.Icons.INFO)
+                        self.set_btn_states()
                     except Exception as e:
                         self.showBottomSheetMsg("Error! No se pudo crear el Archivo",ft.Icons.ERROR)
                         print(e)
