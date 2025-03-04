@@ -26,6 +26,37 @@ class Form(PanelContainer):
         self.addControls()
         
     def addControls(self):
+        self.btn_open_pdf = ft.IconButton(
+                                icon=ft.Icons.PICTURE_AS_PDF,
+                                on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\Guia_aprendizaje.pdf")
+                            )
+
+        self.btn_create_file = ft.IconButton(
+                                icon=ft.Icons.FILE_COPY,
+                                on_click=lambda _:self.copy_file_evi(origen="Format.docx",
+                                                                     to=f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}\\{self.evid_txt.value}\\{self.evid_txt.value}.docx")
+                            )
+
+        self.btn_open_folder_fase = ft.IconButton(
+                                        icon=ft.Icons.FOLDER,
+                                        on_click= lambda _: self.open_os(self.fase_txt.value)
+                                    )
+        
+        self.btn_open_folder_act=ft.IconButton(
+                                        icon=ft.Icons.FOLDER,
+                                        on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}")
+                                    )
+
+        self.btn_open_folder_cod_act = ft.IconButton(
+                                        icon=ft.Icons.FOLDER,
+                                        on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}")
+                                    )
+
+        self.btn_open_folder_evi = ft.IconButton(
+                                        icon=ft.Icons.FOLDER,
+                                        on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}\\{self.evid_txt.value}")
+                                    )
+        
         col=ft.Row([
                 ft.NavigationRail(
                     selected_index=0,
@@ -33,15 +64,8 @@ class Form(PanelContainer):
                     width=40,
                     min_extended_width=400,
                     leading=ft.Column([
-                            ft.IconButton(
-                                icon=ft.Icons.PICTURE_AS_PDF,
-                                on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\Guia_aprendizaje.pdf")
-                            ),
-                            ft.IconButton(
-                                icon=ft.Icons.FILE_COPY,
-                                on_click=lambda _:self.copy_file_evi(origen="Format.docx",
-                                                                     to=f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}\\{self.evid_txt.value}\\{self.evid_txt.value}.docx")
-                            )
+                            self.btn_open_pdf,
+                            self.btn_create_file
                         ]),
                     group_alignment=-0.9,
                     destinations=[ft.NavigationRailDestination(disabled=True)]
@@ -55,37 +79,25 @@ class Form(PanelContainer):
                                     expand=True,name="FASE",
                                     control=self.fase_txt,
                                     icon =ft.Icons.TEXT_FIELDS,
-                                    trailing=ft.IconButton(
-                                        icon=ft.Icons.FOLDER,
-                                        on_click= lambda _: self.open_os(self.fase_txt.value)
-                                    )),
+                                    trailing= self.btn_open_folder_fase),
                                 self.component_container(
                                     expand=True,name="ACTIVIDAD",
                                     control=self.actividad_txt,
                                     icon =ft.Icons.TEXT_FIELDS,
-                                    trailing=ft.IconButton(
-                                        icon=ft.Icons.FOLDER,
-                                        on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}")
-                                    )),
+                                    trailing= self.btn_open_folder_act),
                             
                                 self.component_container(
                                     expand=True,name="CODIGO ACTIVIDAD",
                                     control=self.cod_act_txt,
                                     icon =ft.Icons.CODE,
-                                    trailing=ft.IconButton(
-                                        icon=ft.Icons.FOLDER,
-                                        on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}")
-                                    )),
+                                    trailing= self.btn_open_folder_cod_act ),
                             ]),
                             ft.Row(controls=[
                                 self.component_container(
                                     expand=True,name="EVIDENCIA",
                                     control=self.evid_txt,
                                     icon =ft.Icons.BOOK,
-                                    trailing=ft.IconButton(
-                                        icon=ft.Icons.FOLDER,
-                                        on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}\\{self.evid_txt.value}")
-                                    )),
+                                    trailing=self.btn_open_folder_evi),
                             ]),
                             
                             ft.Row(controls=[
@@ -124,6 +136,8 @@ class Form(PanelContainer):
         )
         self.setModalDialog("EVIDENCIA",col,self.onYesOption)
 
+    
+
     def initComponents(self):
         self.data = {}
         self.cb = ft.Dropdown(
@@ -150,7 +164,31 @@ class Form(PanelContainer):
                     last_date=datetime(year=now.year, month=now.month, day=now.day),
                     on_change=self.handle_change
                 )
-       
+    def set_btn_states(self):
+        route = f"{self.fase_txt.value}\\{self.actividad_txt.value}\\Guia_aprendizaje.pdf"
+        self.validate_route(self.btn_open_pdf,route)
+
+        route = f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}\\{self.evid_txt.value}\\{self.evid_txt.value}.docx"
+        self.validate_route(self.btn_create_file,route)
+
+        route = self.fase_txt.value
+        self.validate_route(self.btn_open_folder_fase,route)
+        
+        route = f"{self.fase_txt.value}\\{self.actividad_txt.value}"
+        self.validate_route(self.btn_open_folder_act,route)
+
+        route = f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}"
+        self.validate_route(self.btn_open_folder_cod_act,route)
+
+        route = f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}\\{self.evid_txt.value}"
+        self.validate_route(self.btn_open_folder_evi,route)
+        
+    def validate_route(self,btn,route):
+        print(btn.icon_color)
+        route = f"{self.page.session.get("RutaOrigen")}\\{route}"
+        btn.icon_color= "ffffff" if os.path.exists(route) else ft.Colors.RED
+        btn.update() if btn.page else None
+   
     def handle_change(self,e):
         self.fecha_txt.value =e.control.value.strftime('%Y-%m-%d')
 
@@ -173,7 +211,7 @@ class Form(PanelContainer):
                 "CODIGO ACTIVIDAD":self.cod_act_txt .value.upper(),
                 "EVIDENCIA":self.evid_txt .value.upper(),
                 "FECHA": "NO HECHO" if self.fecha_txt.value =="" else self.fecha_txt .value.upper(),
-                "NOTA":self.nota_txt .value.upper(),
+                "NOTA": "--" if self.nota_txt .value =="" else self.nota_txt.value.upper(),
                 "OBSERVACION":self.observacion_txt .value.upper(),
                 "IMPORTANTE":"SI"  if self.impr_check.value else "NO"
             }
@@ -194,8 +232,6 @@ class Form(PanelContainer):
         try:
             self.clear_data()
             
-            
-
             self.index_txt.value = data.name
             self.fase_txt .value = data["FASE" ]
             self.actividad_txt .value = data["ACTIVIDAD" ]
@@ -215,6 +251,7 @@ class Form(PanelContainer):
             self.observacion_txt.update() if self.observacion_txt.page else None
             self.impr_check.update() if self.impr_check.page else None
 
+            self.set_btn_states()
             self.showModalDialog()
         except Exception as e:
             print(self.__class__,"setData",e)
@@ -247,6 +284,7 @@ class Form(PanelContainer):
         self.showLoadingSheetMsg()
         ruta = f"{self.page.session.get("RutaOrigen")}\\{value}"
 
+        print(ruta)
         if(os.path.exists(ruta)):
             os.startfile(ruta)
             self.showBottomSheetMsg("Abriendo Ruta",ft.Icons.THUMB_UP)
@@ -260,6 +298,7 @@ class Form(PanelContainer):
             os.makedirs(ruta)
             os.startfile(ruta)
             self.showBottomSheetMsg("Abriendo Ruta",ft.Icons.THUMB_UP)
+            self.set_btn_states()
         except Exception as ex:
             self.showBottomSheetMsg("Error al crear la carpeta",ft.Icons.ERROR)
             print(ex)
