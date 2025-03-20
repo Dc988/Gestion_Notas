@@ -91,3 +91,34 @@ class Notas_view(PanelContainer):
         else:
             self.showAlertDialog("Error!! Panel Notas", "actualice panel de configuraciones", ft.Icons.ERROR)
         self.closeLoadingDialog()
+#"""
+import flet as ft
+from layouts.Notas.FilterTable_2 import FilterTable_view
+
+def main(page: ft.Page):
+    filter = {
+        "f1":{
+                'CODIGO ACTIVIDAD': {'VALUES': ['12'], 'TYPE': 'IGUAL A'}, 
+                'EVIDENCIA': {'VALUES': ['12'], 'TYPE': 'IGUAL A'}
+            },
+        "f2":{
+                'CODIGO ACTIVIDAD': {'VALUES': ['12'], 'TYPE': 'IGUAL A'}, 
+                'EVIDENCIA': {'VALUES': ['12'], 'TYPE': 'IGUAL A'}
+            }
+    }
+
+    
+    page.theme_mode = ft.ThemeMode.LIGHT  # Modo por defecto
+    filter_view = FilterTable_view(page,onYes=None)
+    #filter_view.setFilterPred(filter)
+    switch = ft.IconButton(
+                        icon=ft.Icons.FILTER_ALT_SHARP,
+                        on_click=lambda _: filter_view.showModalDialog()
+                    )
+    page.add(
+        switch
+        )
+    
+ft.app(target=main)#"""
+
+

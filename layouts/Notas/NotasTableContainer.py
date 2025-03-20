@@ -218,7 +218,7 @@ class Header(PanelContainer):
             alignment=  ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[self.filter,
                       ft.IconButton(
-                        icon=ft.icons.FILTER_ALT_SHARP,
+                        icon=ft.Icons.FILTER_ALT_SHARP,
                         on_click=lambda _: self.filter_view.showModalDialog()
                     )]
         )
@@ -231,12 +231,10 @@ class Header(PanelContainer):
                 self.filterData[filterby]["TYPE"]=option
         else:
             self.filterData[filterby] = {"VALUES":[value],"TYPE":option}
-
+        print(self.filterData)
             
         
     def add_filter_components(self):
-        
-
         def delete_filter(target,data):
             key,item = data
            
@@ -286,7 +284,6 @@ class Header(PanelContainer):
             self.add_filter_components()
             self.datatable.setDataTable()
             self.update()
-            print(self.filterData)
         else:
             self.showAlertDialog("Error!","ingrese un valor al filtrar", ft.Icons.ERROR)
 

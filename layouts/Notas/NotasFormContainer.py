@@ -184,7 +184,6 @@ class Form(PanelContainer):
         self.validate_route(self.btn_open_folder_evi,route)
         
     def validate_route(self,btn,route):
-        print(btn.icon_color)
         route = f"{self.page.session.get("RutaOrigen")}\\{route}"
         btn.icon_color= "ffffff" if os.path.exists(route) else ft.Colors.RED
         btn.update() if btn.page else None
@@ -284,7 +283,6 @@ class Form(PanelContainer):
         self.showLoadingSheetMsg()
         ruta = f"{self.page.session.get("RutaOrigen")}\\{value}"
 
-        print(ruta)
         if(os.path.exists(ruta)):
             os.startfile(ruta)
             self.showBottomSheetMsg("Abriendo Ruta",ft.Icons.THUMB_UP)

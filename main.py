@@ -11,10 +11,8 @@ class principal(TapContainer):
         super().__init__(**kwargs)
         self.page = None
         
-    
     def setPage(self,page):
         self.page = page
-
 
     def Data_panel_container(self):
         
@@ -29,7 +27,6 @@ class principal(TapContainer):
             text="Notas",
             target=self.nota_panel,
             icon=ft.Icons.NOTES)
-        
 
 def main(page:ft.Page):
   
