@@ -15,7 +15,7 @@
         "OBSERVACION"
     ],
     "FilterPred": {
-        "Filtro 1": {
+        "Entregado sin calificacion": {
             "FECHA": {
                 "VALUES": [
                     "2"
@@ -29,12 +29,20 @@
                 "TYPE": "igual a"
             }
         },
-        "Filtro 2": {
+        "Pendientes": {
             "FECHA": {
                 "VALUES": [
                     "NO"
                 ],
                 "TYPE": "igual a"
+            }
+        },
+        "Nota Perdida": {
+            "NOTA": {
+                "VALUES": [
+                    "D"
+                ],
+                "TYPE": "IGUAL A"
             }
         }
     },

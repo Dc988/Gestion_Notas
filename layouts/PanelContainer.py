@@ -135,8 +135,14 @@ class PanelContainer(ft.Container):
    def setModalDialog(self,title:str,content:ft.Control,YesOption:callable,NoOption:callable =None):
       def onYesOption(e):
          if YesOption is not None:
+            btn = e.control
+            btn.disabled =True
+            btn.update() if btn.page else None
             if(YesOption()):
                self.close_alert(e)
+            
+            btn.disabled =False
+            btn.update() if btn.page else None
          else:
             self.close_alert(e)
       

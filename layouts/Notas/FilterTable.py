@@ -83,14 +83,28 @@ class FilterTable_view(PanelContainer):
         self.predFilterPanel = ft.Column(controls=[],alignment=ft.MainAxisAlignment.CENTER,)
 
         def btnPredOnclick(e):
-            index = len(self.predFilterPanel.controls) +1
-            self.predFilterPanel.controls.append(self.getItemFilterPred(f"Filtro {index}"))
-            self.predFilterPanel.update() if self.predFilterPanel.page else None
+            if filterName.value !="":
+                self.predFilterPanel.controls.append(self.getItemFilterPred(filterName.value))
+                filterName.value =""
 
+                filterName.update() if filterName.page else None
+                self.predFilterPanel.update() if self.predFilterPanel.page else None
+
+        filterName =ft.TextField(
+                        border_color="transparent",
+                        width=70,
+                        height=15,
+                        text_size=10,
+                        content_padding=0,
+                        cursor_color="black",
+                        cursor_width=1,
+                        cursor_height=18,
+                        color="black"
+                    )
         header = ft.ListTile(
                     height=35,
                     title=ft.Text("FILTROS PREDETERMINADOS",size=13,weight=ft.FontWeight.BOLD,color=ft.colors.BLUE_900),
-                    trailing=ft.IconButton(icon_size=18,width=35,height=35,icon=ft.Icons.ADD,on_click=btnPredOnclick)
+                    trailing=ft.Row([filterName,ft.IconButton(icon_size=18,width=35,height=35,icon=ft.Icons.ADD,on_click=btnPredOnclick)],width=110)
                 )
         
         col.controls.append(
@@ -113,9 +127,6 @@ class FilterTable_view(PanelContainer):
         self.option_combobox.options = [ft.dropdown.Option(item) for item in opt]
         self.option_combobox.value = opt[0]
         self.option_combobox.update() if self.option_combobox.page else None
-
-    def addItemFilter(self):
-        print("Hola")
 
     def getRowItemFilterPred(self, col, opt, val, item):
         
@@ -164,7 +175,6 @@ class FilterTable_view(PanelContainer):
                 row = self.getRowItemFilterPred(col,opt,val,item)
                 item.controls.append(row)
                 item.update() if item.page else None
-                #self.addItemFilter(col,opt,val)
 
         item = ft.ExpansionTile(
                 title=ft.Text(name,size=12,weight=ft.FontWeight.BOLD),
@@ -232,12 +242,8 @@ class FilterTable_view(PanelContainer):
             data = self.configController.edit_json(data)
 
             self.showBottomSheetMsg(
-                title="Mensaje!", 
-                content="Datos Guardados Correctamente!", 
-                icon=ft.Icons.CHECK) if data else self.showAlertDialog(
-                title="Error!", 
-                content="No se pudo guardar la informacion!", 
-                icon=ft.Icons.ERROR)
+                text="Datos Guardados Correctamente!", 
+                icon=ft.Icons.CHECK) 
         return False
     
     def setFilter(self,e):
