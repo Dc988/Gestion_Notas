@@ -72,7 +72,7 @@ class Config_view(PanelContainer):
             
             data = {
             "RutaOrigen":self.txt_ruta_carpeta.value,
-            "visibleColumns":self.editColModal.selectedCols
+            "visibleColumns":self.editColModal.selectedCols,
             }
             data = self.configController.edit_json(data)
 
@@ -108,7 +108,6 @@ class Config_view(PanelContainer):
             self.txt_cols_visible.value= ", ".join(data.get("visibleColumns"))
             
             self.page.session.set("FilterPred",data.get("FilterPred"))
-            self.page.session.set("rutaArchivo",data.get("rutaArchivo"))
             self.page.session.set("RutaOrigen",data.get("RutaOrigen"))
             self.page.session.set("visibleColumns",data.get("visibleColumns"))
             self.page.session.set("col_oblig",data.get("col_oblig"))

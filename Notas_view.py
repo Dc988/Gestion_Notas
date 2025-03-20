@@ -77,7 +77,7 @@ class Notas_view(PanelContainer):
         self.showLoadingDialog()
         self.dataController = DataController()
 
-        if self.page.session.get("rutaArchivo") != "" and self.page.session.get("visibleColumns") != [] and self.page.session.get("RutaOrigen") != "" :
+        if self.page.session.get("visibleColumns") != [] and self.page.session.get("RutaOrigen") != "" :
 
             if not self.dataController.read_file():
                 self.tableData.clearData()

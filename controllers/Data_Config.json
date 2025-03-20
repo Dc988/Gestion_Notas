@@ -1,5 +1,4 @@
 {
-    "rutaArchivo": "G:\\Mi unidad\\1. Documentos\\1. CURSOS\\2. ANALISIS Y DESARROLLO DE SOFTWARE. (2898288)\\02. PROYECTO\\Seguimiento de notas.xlsx",
     "visibleColumns": [
         "EVIDENCIA",
         "FECHA",
@@ -15,6 +14,29 @@
         "NOTA",
         "OBSERVACION"
     ],
-    "FilterPred": {},
+    "FilterPred": {
+        "Filtro 1": {
+            "FECHA": {
+                "VALUES": [
+                    "2"
+                ],
+                "TYPE": "igual a"
+            },
+            "NOTA": {
+                "VALUES": [
+                    "--"
+                ],
+                "TYPE": "igual a"
+            }
+        },
+        "Filtro 2": {
+            "FECHA": {
+                "VALUES": [
+                    "NO"
+                ],
+                "TYPE": "igual a"
+            }
+        }
+    },
     "RutaOrigen": "G:\\Mi unidad\\1. Documentos\\1. CURSOS\\2. ANALISIS Y DESARROLLO DE SOFTWARE. (2898288)\\02. PROYECTO"
 }

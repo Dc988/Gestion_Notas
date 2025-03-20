@@ -2,6 +2,7 @@
 import flet as ft
 from layouts.PanelContainer import PanelContainer
 from controllers.DataController import DataController
+from controllers.ConfigController import ConfigController
 
 class FilterTable_view(PanelContainer):
 
@@ -11,6 +12,7 @@ class FilterTable_view(PanelContainer):
 
         self.onYes=onYes
         self.onNo=onNo
+        self.configController = ConfigController()
 
         self.initialize_components()
         self.add_items_combobox_option(["igual a","no igual","contiene","no contiene"])
@@ -123,7 +125,7 @@ class FilterTable_view(PanelContainer):
             print(e) 
             item.controls.remove(row)
             item.update() if item.page else None
-            
+
         row = ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN,data =[col,opt,val] )
         row.controls = [
                     ft.Row([ft.Text(value="Columna:",weight=ft.FontWeight.BOLD),ft.Text(col)]),
@@ -149,9 +151,9 @@ class FilterTable_view(PanelContainer):
                             ,value=data[2])
 
         def addData(e: ft.ControlEvent):
-            col = self.fiter_combobox.value 
-            opt= self.option_combobox.value 
-            val = self.txt_filter.value 
+            col = self.fiter_combobox.value.upper() 
+            opt= self.option_combobox.value.upper() 
+            val = self.txt_filter.value.upper() 
             
             if (col == "" or
                 opt =="" or
@@ -200,7 +202,7 @@ class FilterTable_view(PanelContainer):
         
     def guardar(self):
         filterData={}
-        
+       
         for item in self.predFilterPanel.controls:
             title = item.title.value
             rows = item.controls
@@ -221,14 +223,27 @@ class FilterTable_view(PanelContainer):
                 else:
                     filterData[title][filterby] = {"VALUES":[value],"TYPE":option}
                 
-        
-        print(filterData)
+        if (filterData !={}):
+            
+            data = {
+            "FilterPred":filterData
+            }
+
+            data = self.configController.edit_json(data)
+
+            self.showBottomSheetMsg(
+                title="Mensaje!", 
+                content="Datos Guardados Correctamente!", 
+                icon=ft.Icons.CHECK) if data else self.showAlertDialog(
+                title="Error!", 
+                content="No se pudo guardar la informacion!", 
+                icon=ft.Icons.ERROR)
         return False
     
     def setFilter(self,e):
-        col = self.fiter_combobox.value 
-        opt= self.option_combobox.value 
-        val = self.txt_filter.value 
+        col = self.fiter_combobox.value.upper() 
+        opt= self.option_combobox.value.upper() 
+        val = self.txt_filter.value.upper() 
         
         if (col == "" or
             opt =="" or
@@ -238,9 +253,9 @@ class FilterTable_view(PanelContainer):
             
             if self.onYes !=None:
             
-                self.onYes(filterby=self.fiter_combobox.value.upper()
-                            ,option=self.option_combobox.value.upper()
-                            ,value=self.txt_filter.value.upper())
+                self.onYes(filterby=self.fiter_combobox.value
+                            ,option=self.option_combobox.value
+                            ,value=self.txt_filter.value)
             self.clean_val()
             
     def initFilterPred(self):
