@@ -231,7 +231,6 @@ class Header(PanelContainer):
                 self.filterData[filterby]["TYPE"]=option
         else:
             self.filterData[filterby] = {"VALUES":[value],"TYPE":option}
-        print(self.filterData)
             
         
     def add_filter_components(self):

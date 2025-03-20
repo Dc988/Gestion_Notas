@@ -107,6 +107,7 @@ class Config_view(PanelContainer):
             self.txt_ruta_carpeta.value=data.get("RutaOrigen")
             self.txt_cols_visible.value= ", ".join(data.get("visibleColumns"))
             
+            self.page.session.set("FilterPred",data.get("FilterPred"))
             self.page.session.set("rutaArchivo",data.get("rutaArchivo"))
             self.page.session.set("RutaOrigen",data.get("RutaOrigen"))
             self.page.session.set("visibleColumns",data.get("visibleColumns"))

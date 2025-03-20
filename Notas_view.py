@@ -91,7 +91,7 @@ class Notas_view(PanelContainer):
         else:
             self.showAlertDialog("Error!! Panel Notas", "actualice panel de configuraciones", ft.Icons.ERROR)
         self.closeLoadingDialog()
-#"""
+"""
 import flet as ft
 from layouts.Notas.FilterTable_2 import FilterTable_view
 
