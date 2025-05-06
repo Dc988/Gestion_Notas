@@ -24,7 +24,7 @@ class Notas_view(PanelContainer):
                     leading=ft.Column([
                         ft.IconButton(
                             icon=ft.Icons.UPDATE,
-                            on_click=lambda _: self.setDataTable()
+                            on_click=lambda _: self.showOptionDialog("Desea actualizar los datos?",self.setDataTable,icon=ft.Icons.INFO)
                             ),
                         ft.IconButton(
                             icon=ft.Icons.ADD,
@@ -93,32 +93,56 @@ class Notas_view(PanelContainer):
         self.closeLoadingDialog()
 """
 import flet as ft
-from layouts.Notas.FilterTable_2 import FilterTable_view
+import fitz  # PyMuPDF
+
+# Función para buscar y extraer texto relacionado con el código
+def extraer_evidencia(pdf_path, codigo):
+    doc = fitz.open(pdf_path)
+    pages =False
+    textValue = []
+
+    for page in doc:
+        texto = page.get_text()
+        encontrado = False
+        if codigo in texto:
+            
+            for line in texto.splitlines() :
+                
+                if codigo in line:
+                    encontrado = True
+
+                if encontrado:
+                    if "Para hacer el envío de la evidencia" in line.strip():
+                        pages = True
+                        break
+                    textValue.append(line)
+        if pages:
+            break
+
+    resultado =  "\n".join(textValue)        
+    return resultado if resultado else "Evidencia no encontrada."
 
 def main(page: ft.Page):
-    filter = {
-        "f1":{
-                'CODIGO ACTIVIDAD': {'VALUES': ['12'], 'TYPE': 'IGUAL A'}, 
-                'EVIDENCIA': {'VALUES': ['12'], 'TYPE': 'IGUAL A'}
-            },
-        "f2":{
-                'CODIGO ACTIVIDAD': {'VALUES': ['12'], 'TYPE': 'IGUAL A'}, 
-                'EVIDENCIA': {'VALUES': ['12'], 'TYPE': 'IGUAL A'}
-            }
-    }
+    page.theme_mode=ft.ThemeMode.LIGHT
+    page.title = "Buscador de Evidencias"
+    codigo_input = ft.TextField(label="Código de Evidencia", width=400)
+    resultado_output = ft.Text(value="", expand=True)
+    page.scroll = ft.ScrollMode.AUTO
+    def buscar_click(e):
+        codigo = codigo_input.value.strip()
+        if codigo:
+            resultado = extraer_evidencia("G:/Mi unidad/1. Documentos/1. CURSOS/2. ANALISIS Y DESARROLLO DE SOFTWARE. (2898288)/02. PROYECTO/03. EJECUCIÓN/P6/Guia_aprendizaje.pdf", codigo)
+            resultado_output.value = resultado
+            page.update()
 
-    
-    page.theme_mode = ft.ThemeMode.LIGHT  # Modo por defecto
-    filter_view = FilterTable_view(page,onYes=None)
-    #filter_view.setFilterPred(filter)
-    switch = ft.IconButton(
-                        icon=ft.Icons.FILTER_ALT_SHARP,
-                        on_click=lambda _: filter_view.showModalDialog()
-                    )
     page.add(
-        switch
-        )
-    
-ft.app(target=main)#"""
+        ft.Column([
+            codigo_input,
+            ft.ElevatedButton("Buscar", on_click=buscar_click),
+            resultado_output
+        ])
+    )
 
+ft.app(target=main)
 
+#"""

@@ -195,9 +195,15 @@ class FilterTable_view(PanelContainer):
         return item
 
     def clean_val(self):
-        self.fiter_combobox.value = ""
-        self.option_combobox.value ="igual a"
+        #self.fiter_combobox.value = ""
+        #self.fiter_combobox.update() if self.fiter_combobox.page else None
+
+        #self.option_combobox.value ="igual a"
+        #self.option_combobox.update() if self.option_combobox.page else None
+
         self.txt_filter.value =""
+        self.txt_filter.update() if self.txt_filter.page else None
+
 
     def setData(self,filterby,option,value):
         self.fiter_combobox.value = filterby
@@ -259,9 +265,9 @@ class FilterTable_view(PanelContainer):
             
             if self.onYes !=None:
             
-                self.onYes(filterby=self.fiter_combobox.value
-                            ,option=self.option_combobox.value
-                            ,value=self.txt_filter.value)
+                self.onYes(filterby=col
+                            ,option=opt
+                            ,value=val)
             self.clean_val()
             
     def initFilterPred(self):

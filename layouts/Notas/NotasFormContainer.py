@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 import shutil as sh
 from layouts.PanelContainer import PanelContainer
+import fitz  # PyMuPDF
 
 class Form(PanelContainer):
    
@@ -26,6 +27,9 @@ class Form(PanelContainer):
         self.addControls()
         
     def addControls(self):
+        
+        #""" 
+
         self.btn_open_pdf = ft.IconButton(
                                 icon=ft.Icons.PICTURE_AS_PDF,
                                 on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\Guia_aprendizaje.pdf")
@@ -57,22 +61,9 @@ class Form(PanelContainer):
                                         on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}\\{self.evid_txt.value}")
                                     )
         
-        col=ft.Row([
-                ft.NavigationRail(
-                    selected_index=0,
-                    label_type=ft.NavigationRailLabelType.NONE,
-                    width=40,
-                    min_extended_width=400,
-                    leading=ft.Column([
-                            self.btn_open_pdf,
-                            self.btn_create_file
-                        ]),
-                    group_alignment=-0.9,
-                    destinations=[ft.NavigationRailDestination(disabled=True)]
-                ),
-                ft.VerticalDivider(width=1),
-                ft.Column(
+        self.panel_1 = ft.Column(
                     width=1100,
+                    visible=True,
                     controls=[
                             ft.Row(controls=[
                                 self.component_container(
@@ -131,9 +122,58 @@ class Form(PanelContainer):
                             
                     ]
                 )
+        
+        self.resultado_output = ft.Text(value="", expand=True,selectable=True)
+        self.panel_2 = ft.Column(
+                    width=1100,
+                    height=400,
+                    visible=False,
+                    
+                    scroll= ft.ScrollMode.AUTO,
+                    controls=[
+                            self.resultado_output]
+                )
+        
+        def change_panel(p1, p2, action = None):
+            p1.visible = False
+            p2.visible = True
+            p1.update() if p1.page else None
+            p2.update() if p2.page else None
+
+            action() if action is not None else None
+
+        btn_panel_1 = ft.IconButton(
+                                icon=ft.Icons.DATASET,
+                                icon_color=ft.Colors.BLACK,
+                                on_click=lambda _:change_panel(self.panel_2, self.panel_1))
+
+        btn_panel_2 = ft.IconButton(
+                                icon=ft.Icons.TEXT_FIELDS,
+                                icon_color=ft.Colors.BLACK,
+                                on_click=lambda _: change_panel(self.panel_1, self.panel_2, self.search_evidence_info)
+                            )
+                            
+        col=ft.Row([
+                ft.NavigationRail(
+                    selected_index=0,
+                    label_type=ft.NavigationRailLabelType.NONE,
+                    width=40,
+                    min_extended_width=400,
+                    leading=ft.Column([
+                            btn_panel_1,
+                            btn_panel_2,
+                            self.btn_open_pdf,
+                            self.btn_create_file,
+                        ]),
+                    group_alignment=-0.9,
+                    destinations=[ft.NavigationRailDestination(disabled=True)]
+                ),
+                ft.VerticalDivider(width=1),
+                self.panel_1,
+                self.panel_2
             ],
             expand=True
-        )
+        )#"""
         self.setModalDialog("EVIDENCIA",col,self.onYesOption)
 
     
@@ -250,6 +290,11 @@ class Form(PanelContainer):
             self.observacion_txt.update() if self.observacion_txt.page else None
             self.impr_check.update() if self.impr_check.page else None
 
+            self.panel_1.visible = True
+            self.panel_2.visible = False
+            self.panel_1.update() if self.panel_1.page else None
+            self.panel_2.update() if self.panel_2.page else None
+
             self.set_btn_states()
             self.showModalDialog()
         except Exception as e:
@@ -312,7 +357,7 @@ class Form(PanelContainer):
         self.nota_txt .value=""
         self.observacion_txt .value=""
         self.impr_check .value=False
-
+        self.resultado_output.value = ""
         self.evid_txt.on_submit = self.evidencia_on_submit
 
     def copy_file_evi(self,origen, to):
@@ -392,6 +437,49 @@ class Form(PanelContainer):
         self.actividad_txt.update() if self.actividad_txt.page else None
         self.cod_act_txt.update() if self.cod_act_txt.page else None
 
+    def search_evidence_info(self):
+        def extraer_evidencia(pdf_path, codigo):
+            doc = fitz.open(pdf_path)
+            pages =False
+            textValue = []
+
+            for page in doc:
+                texto = page.get_text()
+                encontrado = False
+                if codigo in texto:
+                    
+                    for line in texto.splitlines() :
+                        
+                        if codigo in line:
+                            encontrado = True
+
+                        if encontrado:
+                            if "Para hacer el envío de la evidencia" in line.strip():
+                                pages = True
+                                break
+                            textValue.append(line)
+                if pages:
+                    break
+
+            resultado =  "\n".join(textValue)        
+            return resultado if resultado else "Evidencia no encontrada."
+        
+
+        codigo = self.evid_txt.value
+        ruta = f"{self.page.session.get("RutaOrigen")}\\{self.fase_txt.value}\\{self.actividad_txt.value}\\Guia_aprendizaje.pdf"
+        
+        if self.resultado_output.value =="":
+            if os.path.exists(ruta): 
+                if codigo != "":
+                    self.showLoadingSheetMsg()
+                    resultado = extraer_evidencia(ruta, codigo)
+                    self.resultado_output.value = resultado
+                    self.resultado_output.update() if self.resultado_output.page else None
+                    self.closeLoadingSheetMsg()
+                else:
+                    self.showBottomSheetMsg("No hay codigo de evidencia!",ft.Icons.WARNING)
+            else:
+                self.showBottomSheetMsg("Guia_aprendizaje No encontrada!",ft.Icons.DANGEROUS)
 
 
 
