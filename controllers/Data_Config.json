@@ -1,9 +1,8 @@
 {
     "visibleColumns": [
+        "ACTIVIDAD",
         "EVIDENCIA",
-        "FECHA",
-        "NOTA",
-        "OBSERVACION"
+        "FECHA"
     ],
     "col_oblig": [
         "FASE",
@@ -32,7 +31,7 @@
         "Pendientes": {
             "FECHA": {
                 "VALUES": [
-                    "NO"
+                    "NO HECHO"
                 ],
                 "TYPE": "igual a"
             }
@@ -43,6 +42,14 @@
                     "D"
                 ],
                 "TYPE": "IGUAL A"
+            }
+        },
+        "prueba": {
+            "ACTIVIDAD": {
+                "VALUES": [
+                    "12"
+                ],
+                "TYPE": "igual a"
             }
         }
     },

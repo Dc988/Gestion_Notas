@@ -31,11 +31,13 @@ class Form(PanelContainer):
         #""" 
 
         self.btn_open_pdf = ft.IconButton(
+                                tooltip= ft.Tooltip("Abrir guia aprendizaje"),
                                 icon=ft.Icons.PICTURE_AS_PDF,
                                 on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\Guia_aprendizaje.pdf")
                             )
 
         self.btn_create_file = ft.IconButton(
+                                tooltip= ft.Tooltip("Copiar Formato Evi."),
                                 icon=ft.Icons.FILE_COPY,
                                 on_click=lambda _:self.copy_file_evi(origen="Format.docx",
                                                                      to=f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}\\{self.evid_txt.value}\\{self.evid_txt.value}.docx")
@@ -124,17 +126,21 @@ class Form(PanelContainer):
                 )
         
         self.resultado_output = ft.Text(value="", expand=True,selectable=True)
+        self.txt_title = ft.Text(value="", expand=True,selectable=True, weight=ft.FontWeight.BOLD, size=15)
         self.panel_2 = ft.Column(
                     width=1100,
-                    height=400,
+                    height=500,
                     visible=False,
                     
                     scroll= ft.ScrollMode.AUTO,
                     controls=[
+                            self.txt_title,
                             self.resultado_output]
                 )
         
         def change_panel(p1, p2, action = None):
+            self.txt_title.value = f"EVIDENCIA {self.evid_txt.value}"
+            self.txt_title.update() if self.txt_title.page else None
             p1.visible = False
             p2.visible = True
             p1.update() if p1.page else None
@@ -144,15 +150,21 @@ class Form(PanelContainer):
 
         btn_panel_1 = ft.IconButton(
                                 icon=ft.Icons.DATASET,
-                                icon_color=ft.Colors.BLACK,
+                                tooltip= ft.Tooltip("Vista Formulario"),
                                 on_click=lambda _:change_panel(self.panel_2, self.panel_1))
 
         btn_panel_2 = ft.IconButton(
+
                                 icon=ft.Icons.TEXT_FIELDS,
-                                icon_color=ft.Colors.BLACK,
+                                tooltip= ft.Tooltip("Informacion Evidencia"),
                                 on_click=lambda _: change_panel(self.panel_1, self.panel_2, self.search_evidence_info)
                             )
-                            
+        btn_delete = ft.IconButton(
+                                    tooltip= ft.Tooltip("ELiminar Registro"),
+                                    icon=ft.Icons.DELETE,
+                                    icon_color=ft.Colors.RED,
+                                    on_click=lambda e: self.showOptionDialog(title="Desea eliminar este registro?",YesOption=self.delete_row,icon=ft.Icons.INFO)
+                                )          
         col=ft.Row([
                 ft.NavigationRail(
                     selected_index=0,
@@ -162,8 +174,11 @@ class Form(PanelContainer):
                     leading=ft.Column([
                             btn_panel_1,
                             btn_panel_2,
+                            ft.Divider(height=1),
                             self.btn_open_pdf,
                             self.btn_create_file,
+                            ft.Divider(height=1),
+                            btn_delete
                         ]),
                     group_alignment=-0.9,
                     destinations=[ft.NavigationRailDestination(disabled=True)]
@@ -174,6 +189,7 @@ class Form(PanelContainer):
             ],
             expand=True
         )#"""
+        
         self.setModalDialog("EVIDENCIA",col,self.onYesOption)
 
     
@@ -195,7 +211,12 @@ class Form(PanelContainer):
         self.evid_txt = self.textfield()
         self.fecha_txt = self.textfield()
         self.nota_txt = self.textfield()
+
         self.observacion_txt = self.textfield()
+        self.observacion_txt.multiline=True
+        self.observacion_txt.min_lines=3
+        self.observacion_txt.max_lines=5
+
         self.impr_check = ft.Checkbox()
         now = datetime.now()
 
@@ -311,6 +332,20 @@ class Form(PanelContainer):
         else:
             print("edit datacontroller null")
 
+    def delete_row(self):
+        if(self.dataController != None):
+            index = self.index_txt.value 
+            
+            if index != "":
+                band = self.dataController.drop_row(index)
+
+                if band:
+                    self.dataTable.setDataTable()
+                    self.showAlertDialog(title="",content="Registro eliminado",icon=ft.Icons.THUMB_UP)
+                else:
+                    self.showBottomSheetMsg(title="Error",content="No se pudo eliminar el registro",icon=ft.Icons.ERROR)
+            else:
+                self.showBottomSheetMsg(title="Error",content="No se pudo eliminar el registro",icon=ft.Icons.ERROR)
 
     def save(self):
         if(self.dataController != None):
@@ -318,6 +353,7 @@ class Form(PanelContainer):
             resp, index = self.dataController.add_row(self.data)
             if(resp):
                 self.index_txt.value = index
+                
                 self.showBottomSheetMsg("Registro añadido!",ft.Icons.THUMB_UP)
             else:
                 self.showBottomSheetMsg("Error!!! no se pudo agrear el registro",ft.Icons.ERROR)
@@ -436,6 +472,8 @@ class Form(PanelContainer):
         self.fase_txt.update()  if self.fase_txt.page else None
         self.actividad_txt.update() if self.actividad_txt.page else None
         self.cod_act_txt.update() if self.cod_act_txt.page else None
+
+    
 
     def search_evidence_info(self):
         def extraer_evidencia(pdf_path, codigo):

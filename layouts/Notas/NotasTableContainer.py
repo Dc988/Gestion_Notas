@@ -1,7 +1,8 @@
 import flet as ft
 from layouts.Notas.FilterTable import FilterTable_view
-
+from collections import defaultdict
 from layouts.PanelContainer import PanelContainer
+import json
 
 class DataTable(PanelContainer):
     def __init__(self,page,data):
@@ -112,7 +113,7 @@ class DataTable(PanelContainer):
             ) for col in self.table_cols
         ])
 
-        cols.append( ft.DataColumn(ft.Text("",size=12,color="black", weight="bold")))
+        #cols.append( ft.DataColumn(ft.Text("",size=12,color="black", weight="bold")))
         
         self.table.columns = cols
         if self.table.page is not None:
@@ -145,14 +146,7 @@ class DataTable(PanelContainer):
         if(data is not None):
             self.fill_items(data)
 
-    def delete_row(self,index):
-
-        band = self.dataController.drop_row(index)
-        if band:
-            self.showAlertDialog(title="",content="Registro eliminado",icon=ft.Icons.THUMB_UP)
-            self.setDataTable()
-        else:
-            self.showAlertDialog(title="Error",content="No se pudo eliminar el registro",icon=ft.Icons.ERROR)
+    
 
     def fill_items(self,data):
 
@@ -163,28 +157,10 @@ class DataTable(PanelContainer):
       
             rows=[]
             for index,row in data.iterrows():
-                cell = [ft.DataCell(ft.Text(index,color="black"))]
+                cell = [ft.DataCell(on_double_tap= lambda e, data=index: self.edit_row(e,data) ,content= ft.Text(index,color="black"))]
   
-                cell.extend([ft.DataCell(ft.Text(cell,color="black",selectable=True)) for cell in row])
-                cell.append(
-                    ft.DataCell(
-                        content=ft.Row(
-                            expand=True, 
-                            controls=[
-                                ft.IconButton(
-                                    icon=ft.Icons.REMOVE_RED_EYE,
-                                    icon_color=ft.Colors.GREEN,
-                                    on_click=lambda e, data=index: self.edit_row(e,data)
-                                ),
-                                ft.IconButton(
-                                    icon=ft.Icons.DELETE,
-                                    icon_color=ft.Colors.RED,
-                                    on_click=lambda e, data=index: self.showOptionDialog(title="Desea eliminar este registro?",YesOption=self.delete_row,icon=ft.Icons.INFO,data=data)
-                                )
-                            ]
-                        )
-                    )
-                )
+                cell.extend([ft.DataCell(on_double_tap= lambda e, data=index: self.edit_row(e,data),content= ft.Text(cell,color="black",selectable=True)) for cell in row])
+                
                 rows.append(ft.DataRow(cells=cell))
 
             self.table.rows=rows
@@ -209,7 +185,7 @@ class Header(PanelContainer):
 
         super().__init__(**header_style)
         self.datatable = dt
-        self.filterData ={}
+        self.filterData = defaultdict(lambda: defaultdict(list))
         self.filter_view = FilterTable_view(dt.page,onYes=self.btn_filter_datatable)
 
         self.filter = ft.Row(expand=True,spacing=10,alignment=ft.MainAxisAlignment.START)
@@ -224,54 +200,52 @@ class Header(PanelContainer):
         )
 
     def add_filter_data(self,filterby,option, value):
-        
-        if filterby in self.filterData:
-            if value not in self.filterData[filterby]["VALUES"]:
-                self.filterData[filterby]["VALUES"].append(value) 
-                self.filterData[filterby]["TYPE"]=option
-        else:
-            self.filterData[filterby] = {"VALUES":[value],"TYPE":option}
-            
+        if value not in self.filterData[filterby][option]:
+            self.filterData[filterby][option].append(value)
         
     def add_filter_components(self):
         def delete_filter(target,data):
-            key,item = data
-           
-            self.filterData[key]["VALUES"].remove(item)
+            try: 
+                key,opt, item = data
             
-            if not self.filterData[key]["VALUES"]:
-                del self.filterData[key]
-            self.datatable.setDataTable()
-            
-            target.visible=False
-            
-            target.update()
+                self.filterData[key][opt].remove(item)
+                
+                if not self.filterData[key][opt]:
+                    del self.filterData[key]
+                self.datatable.setDataTable()
+                
+                target.visible=False
+                
+                target.update()
+            except:
+                pass
 
         row =[]
-        for key,value in self.filterData.items():
-            for item in value['VALUES'] :
-                content =ft.Container(
-                    height=50,
-                    border=ft.border.all(2,"#E3E3E3"),
-                    bgcolor=ft.Colors.WHITE,
-                    border_radius=8,
-                    padding=ft.padding.only(left=10),
-                    
-                    content=ft.Row(spacing=5
-                                ,controls=[ft.Column([ft.Text(key,size=11, weight="bold"),ft.Text(f" {item}",size=10)],spacing=0)])
-                )
+        for col,options in self.filterData.items():
+            for opt, value in options.items():
+                for item in value :
+                    content =ft.Container(
+                        height=50,
+                        border=ft.border.all(2,"#E3E3E3"),
+                        bgcolor=ft.Colors.WHITE,
+                        border_radius=8,
+                        padding=ft.padding.only(left=10),
+                        
+                        content=ft.Row(spacing=5
+                                    ,controls=[ft.Column([ft.Text(col,size=11, weight="bold"),ft.Text(f" {item}",size=10)],spacing=0)])
+                    )
 
-                btn = ft.IconButton(
-                                    icon_size=12,
-                                    width=20,
-                                    height=20,
-                                    padding=2,
-                                    icon=ft.Icons.CLOSE,
-                                    
-                                    on_click=lambda e,target=content, data=[key,item]: delete_filter(target,data)
-                                    )
-                content.content.controls.append(btn)
-                row.append(content)
+                    btn = ft.IconButton(
+                                        icon_size=12,
+                                        width=20,
+                                        height=20,
+                                        padding=2,
+                                        icon=ft.Icons.CLOSE,
+                                        
+                                        on_click=lambda e,target=content, data=[col,opt,item]: delete_filter(target,data)
+                                        )
+                    content.content.controls.append(btn)
+                    row.append(content)
 
         self.filter.controls=row
                   
@@ -308,10 +282,11 @@ class Footer(PanelContainer):
         self.ini=0
         self.fin = self.rows_per_page
 
-        self.display=ft.Row(alignment=  ft.MainAxisAlignment.END,
+        self.display=ft.Row(width=500, alignment=  ft.MainAxisAlignment.END, scroll=ft.ScrollMode.AUTO,
             controls=[])
         self.content=ft.Row(
             alignment=  ft.MainAxisAlignment.SPACE_BETWEEN,
+            expand=True,
             controls=[self.lenText,self.display]
         )
 

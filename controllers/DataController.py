@@ -69,14 +69,40 @@ class DataController():
         return self
     
     def setFilter(self, filter: dict):
+        print(filter)
         data = self.getData()
         if data is not None:
             try:
-                for columna, items in filter.items():
-                    tipo = items["TYPE"]
-                    valores = items["VALUES"]
-                    
-                    data = data[data[columna].astype(str).str.startswith(tuple(valores), na=True)]
+                for columna, options in filter.items():
+                    for tipo, valores in options.items():
+                                                
+                        if tipo == "igual a":
+                            data =  data[data[columna].isin(valores)]
+                        
+                        elif tipo == "no igual":
+                            data =  data[~data[columna].isin(valores)]
+                        
+                        elif tipo == "contiene":
+                            data =  data[data[columna].astype(str).apply(lambda x: any(val in x for val in valores))]
+                        
+                        elif tipo == "no contiene":
+                            data =  data[~data[columna].astype(str).apply(lambda x: any(val in x for val in valores))]
+                        
+                        elif tipo == "empieza":
+                            data =  data[data[columna].astype(str).apply(lambda x: any(x.startswith(val) for val in valores))]
+                        
+                        elif tipo == "no empieza":
+                            data =  data[~data[columna].astype(str).apply(lambda x: any(x.startswith(val) for val in valores))]
+                        
+                        elif tipo == "termina":
+                            data =  data[data[columna].astype(str).apply(lambda x: any(x.endswith(val) for val in valores))]
+                        
+                        elif tipo == "no termina":
+                            data =  data[~data[columna].astype(str).apply(lambda x: any(x.endswith(val) for val in valores))]
+                        
+                        else:
+                            print(f"Operación no soportada: {tipo}")
+                
                 self.data = data
             except Exception as e:
                 print(self.__class__, "setFilter", e)

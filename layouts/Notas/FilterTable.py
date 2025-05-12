@@ -15,7 +15,7 @@ class FilterTable_view(PanelContainer):
         self.configController = ConfigController()
 
         self.initialize_components()
-        self.add_items_combobox_option(["igual a","no igual","contiene","no contiene"])
+        self.add_items_combobox_option(["igual a","no igual","contiene","no contiene","empieza","no empieza","termina", "no termina"])
         self.initFilterPred()
 
     def initialize_components(self):
@@ -162,9 +162,9 @@ class FilterTable_view(PanelContainer):
                             ,value=data[2])
 
         def addData(e: ft.ControlEvent):
-            col = self.fiter_combobox.value.upper() 
-            opt= self.option_combobox.value.upper() 
-            val = self.txt_filter.value.upper() 
+            col = self.fiter_combobox.value 
+            opt= self.option_combobox.value 
+            val = self.txt_filter.value 
             
             if (col == "" or
                 opt =="" or
@@ -172,7 +172,7 @@ class FilterTable_view(PanelContainer):
                     self.showBottomSheetMsg("Campos obligatorios",icon=ft.Icons.INFO)    
                     
             else:
-                row = self.getRowItemFilterPred(col,opt,val,item)
+                row = self.getRowItemFilterPred(col,opt,val.upper(),item)
                 item.controls.append(row)
                 item.update() if item.page else None
 
@@ -253,9 +253,9 @@ class FilterTable_view(PanelContainer):
         return False
     
     def setFilter(self,e):
-        col = self.fiter_combobox.value.upper() 
-        opt= self.option_combobox.value.upper() 
-        val = self.txt_filter.value.upper() 
+        col = self.fiter_combobox.value 
+        opt= self.option_combobox.value 
+        val = self.txt_filter.value 
         
         if (col == "" or
             opt =="" or
@@ -267,7 +267,7 @@ class FilterTable_view(PanelContainer):
             
                 self.onYes(filterby=col
                             ,option=opt
-                            ,value=val)
+                            ,value=val.upper())
             self.clean_val()
             
     def initFilterPred(self):
