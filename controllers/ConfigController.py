@@ -1,17 +1,20 @@
 import json
-
+import os
 class ConfigController():
     def __init__(self):
-        self.archivo = 'controllers/Data_Config.json'
+        self.archivo = '_internal/controllers/Data_Config.json'
        
     def read_document(self):
         datos = None
-        try:
-            with open(self.archivo, 'r', encoding='utf-8') as f:
-                datos = json.load(f)
-        except Exception as e:
-            print(self.__class__,"read_document",e)
-            
+        if(os.path.exists):
+            try:
+                with open(self.archivo, 'r', encoding='utf-8') as f:
+                    datos = json.load(f)
+            except Exception as e:
+                print(self.__class__,"read_document",e)
+        else:
+            print(self.__class__,"read_document","File not exists")
+
         return datos
     
     def edit_json(self,data):

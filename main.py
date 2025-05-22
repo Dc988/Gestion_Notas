@@ -43,8 +43,7 @@ prin = principal()
 
 print("ejecutando")
 ft.app(target=main)
-prin.nota_panel.exportData()
+#prin.nota_panel.exportData()
 print("finalizada")
 
-
-
+#cd 

@@ -172,7 +172,7 @@ class FilterTable_view(PanelContainer):
                     self.showBottomSheetMsg("Campos obligatorios",icon=ft.Icons.INFO)    
                     
             else:
-                row = self.getRowItemFilterPred(col,opt,val.upper(),item)
+                row = self.getRowItemFilterPred(col,opt,val,item)
                 item.controls.append(row)
                 item.update() if item.page else None
 
@@ -267,7 +267,7 @@ class FilterTable_view(PanelContainer):
             
                 self.onYes(filterby=col
                             ,option=opt
-                            ,value=val.upper())
+                            ,value=val)
             self.clean_val()
             
     def initFilterPred(self):

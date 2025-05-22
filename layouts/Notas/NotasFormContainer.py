@@ -63,6 +63,11 @@ class Form(PanelContainer):
                                         on_click=lambda _:self.open_os(f"{self.fase_txt.value}\\{self.actividad_txt.value}\\{self.cod_act_txt.value}\\{self.evid_txt.value}")
                                     )
         
+        container_obs = self.component_container(
+                            expand=True,name="OBSERVACION",
+                            control=self.observacion_txt,
+                            icon =ft.Icons.MENU_OPEN)
+        container_obs.height = 200
         self.panel_1 = ft.Column(
                     width=1100,
                     visible=True,
@@ -116,10 +121,7 @@ class Form(PanelContainer):
                                     icon =ft.Icons.LABEL_IMPORTANT),
                             ]),
                             ft.Row(controls=[
-                                self.component_container(
-                                            expand=True,name="OBSERVACION",
-                                            control=self.observacion_txt,
-                                            icon =ft.Icons.MENU_OPEN),
+                                container_obs
                                 ])                                
                             
                     ]
@@ -216,6 +218,7 @@ class Form(PanelContainer):
         self.observacion_txt.multiline=True
         self.observacion_txt.min_lines=3
         self.observacion_txt.max_lines=5
+        self.observacion_txt.height=175
 
         self.impr_check = ft.Checkbox()
         now = datetime.now()

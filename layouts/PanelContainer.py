@@ -67,6 +67,8 @@ class PanelContainer(ft.Container):
    def showBottomSheetOption(self,text:str,YesOption:callable=None,NoOption:callable =None):
       def onYesOption(e):
          if YesOption is not None:
+            btn_on_yes.disabled=True
+            btn_on_yes.update() if btn_on_yes.page else None
             YesOption()
             self.close_alert(e)
          else:
@@ -92,11 +94,13 @@ class PanelContainer(ft.Container):
             ),
         ),
       )
+
+      btn_on_yes = ft.ElevatedButton("Aceptar",icon =ft.Icons.CHECK,icon_color=ft.Colors.GREEN, on_click=onYesOption,data=self.bs, disabled=False)
       self.bs.content.content.controls=[
                     ft.Text(text,size=15,weight=ft.FontWeight.BOLD),
                     ft.Row([
                         ft.ElevatedButton("Cancelar",icon =ft.Icons.CLOSE,icon_color=ft.Colors.RED, on_click=onNoOption,data=self.bs),
-                        ft.ElevatedButton("Aceptar",icon =ft.Icons.CHECK,icon_color=ft.Colors.GREEN, on_click=onYesOption,data=self.bs)
+                        btn_on_yes
                     ],alignment=ft.MainAxisAlignment.SPACE_BETWEEN)                    
                 ]
       self.page.open(self.bs)

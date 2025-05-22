@@ -9,7 +9,7 @@ class DataController():
     def __init__(self):
          
         self.config = ConfigController()
-        self.config.archivo = 'controllers/Data_Base.json'
+        self.config.archivo = '_internal/controllers/Data_Base.json'
 
         self._document = None
         self.data = None
@@ -69,7 +69,7 @@ class DataController():
         return self
     
     def setFilter(self, filter: dict):
-        print(filter)
+        
         data = self.getData()
         if data is not None:
             try:

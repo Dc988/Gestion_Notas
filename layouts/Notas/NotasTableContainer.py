@@ -153,7 +153,7 @@ class DataTable(PanelContainer):
         if data is not None:
             self.footer.setSize(len(data))
             data = data[self.table_cols]
-            data = data.iloc[self.footer.ini:self.footer.fin]
+            #data = data.iloc[self.footer.ini:self.footer.fin]
       
             rows=[]
             for index,row in data.iterrows():
@@ -293,8 +293,9 @@ class Footer(PanelContainer):
     def setSize(self,value):
         self.size = value
         
-        self.setDisplay()
-        self.lenText.value=f"Página {self.pg} de {self.total_page} - Total {value}"
+        #self.setDisplay()
+        #self.lenText.value=f"Página {self.pg} de {self.total_page} - Total {value}"
+        self.lenText.value=f"Total {value}"
         self.lenText.update() if self.lenText.page else None
         
 

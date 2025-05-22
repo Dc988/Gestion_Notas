@@ -1,8 +1,9 @@
 {
     "visibleColumns": [
-        "ACTIVIDAD",
         "EVIDENCIA",
-        "FECHA"
+        "FECHA",
+        "NOTA",
+        "OBSERVACION"
     ],
     "col_oblig": [
         "FASE",
@@ -19,7 +20,7 @@
                 "VALUES": [
                     "2"
                 ],
-                "TYPE": "igual a"
+                "TYPE": "empieza"
             },
             "NOTA": {
                 "VALUES": [
@@ -42,14 +43,6 @@
                     "D"
                 ],
                 "TYPE": "IGUAL A"
-            }
-        },
-        "prueba": {
-            "ACTIVIDAD": {
-                "VALUES": [
-                    "12"
-                ],
-                "TYPE": "igual a"
             }
         }
     },
