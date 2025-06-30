@@ -2,7 +2,6 @@ import flet as ft
 from layouts.Notas.FilterTable import FilterTable_view
 from collections import defaultdict
 from layouts.PanelContainer import PanelContainer
-import json
 
 class DataTable(PanelContainer):
     def __init__(self,page,data):
@@ -18,7 +17,7 @@ class DataTable(PanelContainer):
                 ft.Column(
                     controls=[ft.Row(controls=[ self.table])],
                     scroll=ft.ScrollMode.HIDDEN,  # Habilitar el scroll automático
-                    height=450,
+                    height=(page.window.height * 0.67),
                     expand=True),
                 self.footer
                     ]
@@ -319,7 +318,7 @@ class Footer(PanelContainer):
                             width=30 ,
                             data = num,
                             on_click=btnPage,
-                            bgcolor= ft.colors.GREY if self.pg == num else ft.colors.WHITE,
+                            bgcolor= ft.Colors.GREY if self.pg == num else ft.Colors.WHITE,
             ) for num in range(1,(self.total_page+ 1))
         ])
 

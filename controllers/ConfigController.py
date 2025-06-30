@@ -2,7 +2,10 @@ import json
 import os
 class ConfigController():
     def __init__(self):
-        self.archivo = '_internal/controllers/Data_Config.json'
+        
+        r1 ='_internal/controllers/Data_Config.json'
+        r2='controllers/Data_Config.json'
+        self.archivo = r1 if os.path.exists(r1) else  r2 
        
     def read_document(self):
         datos = None

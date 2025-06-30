@@ -28,7 +28,6 @@ class FilterTable_view(PanelContainer):
                 border_color="#e0e0e0",
                 filled=False,
                 focused_bgcolor= ft.Colors.RED,
-                height=40,
                 width=200,
                 content_padding=10,
                 options=[],
@@ -41,7 +40,6 @@ class FilterTable_view(PanelContainer):
                 border_color="#e0e0e0",
                 filled=False,
                 focused_bgcolor= ft.Colors.RED,
-                height=40,
                 width=150,
                 content_padding=10,
                 options=[],
@@ -51,16 +49,17 @@ class FilterTable_view(PanelContainer):
                             border_color="#e0e0e0",
                             height=40,
                             width=230,      
-
                             text_size=14,
                             content_padding=10,
                             cursor_color="#e0e0e0",
-                            hint_text="Buscar..."
+                            hint_text="Buscar...",
+                            on_submit=self.setFilter
+
                         )
         exp =  ft.Column([
                         ft.ListTile(
                             height=35,
-                            title=ft.Text("FILTROS",size=13,weight=ft.FontWeight.BOLD,color=ft.colors.BLUE_900)
+                            title=ft.Text("FILTROS",size=13,weight=ft.FontWeight.BOLD,color=ft.Colors.BLUE_900)
                         ),
                         ft.Divider(),
                         ft.Container(
@@ -69,7 +68,7 @@ class FilterTable_view(PanelContainer):
                                         [self.fiter_combobox,
                                         self.option_combobox,
                                         self.txt_filter,
-                                        ft.IconButton(icon_size=18,width=35,height=35,icon=ft.Icons.ADD,on_click=self.setFilter)
+                                        ft.IconButton(icon_size=18,width=35,height=35,icon=ft.Icons.SEARCH,on_click=self.setFilter)
                                         ],
                                         alignment=ft.MainAxisAlignment.CENTER,
                                     )
@@ -103,7 +102,7 @@ class FilterTable_view(PanelContainer):
                     )
         header = ft.ListTile(
                     height=35,
-                    title=ft.Text("FILTROS PREDETERMINADOS",size=13,weight=ft.FontWeight.BOLD,color=ft.colors.BLUE_900),
+                    title=ft.Text("FILTROS PREDETERMINADOS",size=13,weight=ft.FontWeight.BOLD,color=ft.Colors.BLUE_900),
                     trailing=ft.Row([filterName,ft.IconButton(icon_size=18,width=35,height=35,icon=ft.Icons.ADD,on_click=btnPredOnclick)],width=110)
                 )
         

@@ -13,37 +13,9 @@ class Notas_view(PanelContainer):
         
         self.initialize_components()
         self.content.controls = [
-            ft.Row(
-             [
-                ft.NavigationRail(
-                    selected_index=0,
-                    label_type=ft.NavigationRailLabelType.ALL,
-                    # extended=True,
-                    width=40,
-                    min_extended_width=400,
-                    leading=ft.Column([
-                        ft.IconButton(
-                            icon=ft.Icons.UPDATE,
-                            on_click=lambda _: self.showOptionDialog("Desea actualizar los datos?",self.setDataTable,icon=ft.Icons.INFO)
-                            ),
-                        ft.IconButton(
-                            icon=ft.Icons.ADD,
-                            on_click=lambda _: self.showInfoEviModal()
-                        ),
-                        ft.IconButton(
-                            icon=ft.Icons.SAVE,
-                            on_click=lambda _: self.showOptionDialog("Desea guardar los cambios?",self.exportData,icon=ft.Icons.INFO)
-                        )]),
-                    group_alignment=-0.9,
-                    destinations=[ft.NavigationRailDestination(disabled=True)]
-                ),
-                ft.VerticalDivider(width=1),
-                ft.Column([
+            ft.Column([
                     self.tableData
-                           ], alignment=ft.MainAxisAlignment.START, expand=True),
-            ],
-            expand=True
-            )
+                           ], alignment=ft.MainAxisAlignment.START, expand=True)
         ]
         self.setDataTable()
 
@@ -57,6 +29,40 @@ class Notas_view(PanelContainer):
         col = ft.Column(expand=True)
         self.content = col
 
+    def getBtnOptions(self):
+        return [
+                ft.ElevatedButton(
+                    content=ft.Icon(ft.Icons.UPDATE),
+                    style=ft.ButtonStyle(
+                        shape=ft.RoundedRectangleBorder(radius=8),  # Bordes redondeados
+                        padding=20,  # Espaciado interno para que el ícono tenga espacio
+                    ),
+                    tooltip=ft.Tooltip('ACTUALIZAR TABLA'),
+                    # bgcolor='#f0f0f0',
+                    on_click=lambda _: self.showOptionDialog("Desea actualizar los datos?",self.setDataTable,icon=ft.Icons.INFO)
+                    ),
+                ft.ElevatedButton(
+                    content=ft.Icon(ft.Icons.ADD),
+                    style=ft.ButtonStyle(
+                        shape=ft.RoundedRectangleBorder(radius=8),  # Bordes redondeados
+                        padding=20,  # Espaciado interno para que el ícono tenga espacio
+                    ),
+                    tooltip=ft.Tooltip('FORMULARIO DE REGISTRO'),
+                    # bgcolor='#f0f0f0',
+                    on_click=lambda _: self.showInfoEviModal()
+                ),
+                ft.ElevatedButton(
+                    content=ft.Icon(ft.Icons.SAVE),
+                    style=ft.ButtonStyle(
+                        shape=ft.RoundedRectangleBorder(radius=8),  # Bordes redondeados
+                        padding=20,  # Espaciado interno para que el ícono tenga espacio
+                    ),
+                    tooltip=ft.Tooltip('GUARDAR CAMBIOS'),
+                    # bgcolor='#f0f0f0',
+                    on_click=lambda _: self.showOptionDialog("Desea guardar los cambios?",self.exportData,icon=ft.Icons.INFO)
+                )
+                ]
+    
     def showInfoEviModal(self):
         self.fr.clear_data() 
         self.fr.showModalDialog()

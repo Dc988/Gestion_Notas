@@ -9,7 +9,10 @@ class DataController():
     def __init__(self):
          
         self.config = ConfigController()
-        self.config.archivo = '_internal/controllers/Data_Base.json'
+        r1 ='_internal/controllers/Data_Base.json'
+        r2='controllers/Data_Base.json'
+        self.config.archivo = r1 if os.path.exists(r1) else  'controllers/Data_Base.json' 
+       
 
         self._document = None
         self.data = None
@@ -118,7 +121,6 @@ class DataController():
                 data.sort_values(by=column.upper(),ascending=order,inplace=True)
         return self
 
-
     def getLen(self):
         data = self.getData()
         lenData = -1
@@ -153,8 +155,6 @@ class DataController():
             print(self.__class__,"add_row",e)
                 
         return band,index
-
-
 
     def edit_row(self,index:int,row:dict):
         try:

@@ -200,7 +200,6 @@ class Form(PanelContainer):
         self.data = {}
         self.cb = ft.Dropdown(
                 label = "",
-                height=20,
                 text_size=13,
                 border_color="transparent",
                 content_padding=10,

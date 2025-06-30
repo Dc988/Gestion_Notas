@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set "VIRTUAL_ENV=C:\Users\dicma\Documents\GitHub\Gestion_Notas\venv"
+set "VIRTUAL_ENV=C:\Users\ayala\OneDrive\Documentos\Proyectos\Github\Gestion_Notas\venv"
 
 if not defined PROMPT set PROMPT=$P$G
 
