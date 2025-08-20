@@ -35,7 +35,7 @@ class TapContainer(ft.Row):
                 selected_index=0,
                 group_alignment=-0.9,
                 label_type=ft.NavigationRailLabelType.ALL,
-                min_width=100,
+                min_width=40,
                 min_extended_width=400,
                 destinations=[],
                 trailing=ft.Column([],expand=True,alignment=ft.MainAxisAlignment.END),

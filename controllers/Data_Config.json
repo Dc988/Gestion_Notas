@@ -1,14 +1,14 @@
 {
     "visibleColumns": [
+        "FASE",
         "EVIDENCIA",
         "FECHA",
-        "NOTA",
-        "OBSERVACION"
+        "NOTA"
     ],
     "col_oblig": [
         "FASE",
         "ACTIVIDAD",
-        "CODIGO ACTIVIDAD",
+        "CODIGO_ACTIVIDAD",
         "EVIDENCIA",
         "FECHA",
         "NOTA",

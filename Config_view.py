@@ -134,8 +134,9 @@ class Config_view(PanelContainer):
     def save_file_result(self,e: ft.FilePickerResultEvent):
         def save():
             self.showLoadingDialog()
-            temp = DataController()
+            temp = DataController(self.page)
             band = temp.exportDataFrame(e.path)
+            band = band["status"]
             data = {
                 "title":"Accion exitosa" if band else "Ocurrio un error!",
                 "content":"Datos importados" if band else "No se pudo importar la informacion",
@@ -151,8 +152,11 @@ class Config_view(PanelContainer):
     def pick_file_result(self,e: ft.FilePickerResultEvent):
         def save():
             self.showLoadingDialog()
-            temp = DataController()
-            band = temp.importDataFrame(ruta)
+            temp = DataController(self.page)
+            band = temp.import_data(ruta)
+            print("resultado ",band)
+            band= band["status"]
+
             data = {
                 "title":"Accion exitosa" if band else "Ocurrio un error!",
                 "content":"Datos importados" if band else "No se pudo importar la informacion",
@@ -175,8 +179,6 @@ class Config_view(PanelContainer):
         except Exception as ex:
             self.showAlertDialog("Error","No se pudo importar el archivo!",ft.Icons.ERROR)
             print(ex)
-
-
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:

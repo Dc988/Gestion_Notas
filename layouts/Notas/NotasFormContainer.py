@@ -165,7 +165,7 @@ class Form(PanelContainer):
                                     tooltip= ft.Tooltip("ELiminar Registro"),
                                     icon=ft.Icons.DELETE,
                                     icon_color=ft.Colors.RED,
-                                    on_click=lambda e: self.showOptionDialog(title="Desea eliminar este registro?",YesOption=self.delete_row,icon=ft.Icons.INFO)
+                                    on_click=lambda e: self.showBottomSheetOption(text="Desea eliminar este registro?",YesOption=self.delete_row)
                                 )          
         col=ft.Row([
                 ft.NavigationRail(
@@ -270,7 +270,7 @@ class Form(PanelContainer):
             self.data = {
                 "FASE":self.fase_txt .value.upper(),
                 "ACTIVIDAD":self.actividad_txt .value.upper(),
-                "CODIGO ACTIVIDAD":self.cod_act_txt .value.upper(),
+                "CODIGO_ACTIVIDAD":self.cod_act_txt .value.upper(),
                 "EVIDENCIA":self.evid_txt .value.upper(),
                 "FECHA": "NO HECHO" if self.fecha_txt.value =="" else self.fecha_txt .value.upper(),
                 "NOTA": "--" if self.nota_txt .value =="" else self.nota_txt.value.upper(),
@@ -294,15 +294,15 @@ class Form(PanelContainer):
         try:
             self.clear_data()
             
-            self.index_txt.value = data.name
-            self.fase_txt .value = data["FASE" ]
-            self.actividad_txt .value = data["ACTIVIDAD" ]
-            self.cod_act_txt .value = data["CODIGO ACTIVIDAD" ]
-            self.evid_txt .value = data["EVIDENCIA" ]
-            self.fecha_txt .value = data["FECHA" ]
-            self.nota_txt .value = data["NOTA" ]
-            self.observacion_txt .value = data["OBSERVACION" ]
-            self.impr_check.value = data["IMPORTANTE" ] == "SI"
+            self.index_txt.value = data[0]
+            self.fase_txt .value = data[1]
+            self.actividad_txt .value = data[2]
+            self.cod_act_txt .value = data[3 ]
+            self.evid_txt .value = data[4 ]
+            self.fecha_txt .value = data[5 ]
+            self.nota_txt .value = data[6]
+            self.observacion_txt .value = data[7 ]
+            self.impr_check.value = data[8 ] == "SI"
 
             self.fase_txt.update()  if self.fase_txt.page else None
             self.actividad_txt.update() if self.actividad_txt.page else None
@@ -325,9 +325,10 @@ class Form(PanelContainer):
 
     def edit(self):
         if(self.dataController != None):
-            index = self.index_txt.value
-            resp = self.dataController.edit_row(index,self.data)
-            if(resp):
+            self.data['ID']= self.index_txt.value
+            
+            resp = self.dataController.update(**self.data)
+            if(resp["status"] == True):
                 self.showBottomSheetMsg("Registro editado!",ft.Icons.THUMB_UP)
             else:
                 self.showBottomSheetMsg("Error!!! no se pudo editado el registro",ft.Icons.ERROR)
@@ -337,23 +338,26 @@ class Form(PanelContainer):
     def delete_row(self):
         if(self.dataController != None):
             index = self.index_txt.value 
-            
+            print("index", index)
             if index != "":
-                band = self.dataController.drop_row(index)
+                band = self.dataController.delete(index)
 
                 if band:
+                    self.showAlertDialog(title="", content="Registro eliminado",icon=ft.Icons.THUMB_UP)
                     self.dataTable.setDataTable()
-                    self.showAlertDialog(title="",content="Registro eliminado",icon=ft.Icons.THUMB_UP)
                 else:
-                    self.showBottomSheetMsg(title="Error",content="No se pudo eliminar el registro",icon=ft.Icons.ERROR)
+                    self.showBottomSheetMsg(text="Error, No se pudo eliminar el registro",icon=ft.Icons.ERROR)
             else:
-                self.showBottomSheetMsg(title="Error",content="No se pudo eliminar el registro",icon=ft.Icons.ERROR)
+                self.showBottomSheetMsg(text="Error, No se pudo eliminar el registro",icon=ft.Icons.ERROR)
 
     def save(self):
         if(self.dataController != None):
 
-            resp, index = self.dataController.add_row(self.data)
-            if(resp):
+            resp = self.dataController.add_row(self.data)
+
+            if(resp["status"] == True):
+                
+                index = resp["data"]
                 self.index_txt.value = index
                 
                 self.showBottomSheetMsg("Registro añadido!",ft.Icons.THUMB_UP)
@@ -413,8 +417,6 @@ class Form(PanelContainer):
                     except Exception as e:
                         self.showBottomSheetMsg("Error! No se pudo crear el Archivo",ft.Icons.ERROR)
                         print(e)
-
-
 
             else:
                 self.showBottomSheetMsg(f"Plantilla no existe",ft.Icons.ERROR)

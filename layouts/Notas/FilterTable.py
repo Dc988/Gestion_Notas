@@ -131,8 +131,7 @@ class FilterTable_view(PanelContainer):
         
 
         def handle_delete_row(e: ft.ControlEvent):
-            print(item.controls)
-            print(e) 
+
             item.controls.remove(row)
             item.update() if item.page else None
 

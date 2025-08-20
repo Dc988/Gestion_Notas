@@ -1,283 +1,240 @@
+from controllers.Model.Model import Model
 import pandas as pd
-import os
-from controllers.ConfigController import ConfigController
 
-class DataController():
 
+class DataController:
     _instance = None
+    # se inicializa variables globales
+    def __init__ (self,page):
+        self.evidencia = Model(table="EVIDENCIA",ruta="controllers/Model/query.sql")
+        self.actividad = Model(table="ACTIVIDAD")
+        self.cod_actividad = Model(table="COD_ACTIVIDAD")
+        self.fase = Model(table="FASE")
 
-    def __init__(self):
-         
-        self.config = ConfigController()
-        r1 ='_internal/controllers/Data_Base.json'
-        r2='controllers/Data_Base.json'
-        self.config.archivo = r1 if os.path.exists(r1) else  'controllers/Data_Base.json' 
-       
-
-        self._document = None
-        self.data = None
+        self.order=["EVIDENCIA.ID","DESC"]
+        self.page = page
+        # columnas obligatorias
+        
+        self.table_cols = ["EVIDENCIA.ID"] + self.page.session.get("visibleColumns") 
+        self.columns_valid=["FASE","ACTIVIDAD","CODIGO_ACTIVIDAD", "EVIDENCIA", "FECHA", "NOTA", "OBSERVACION", "IMPORTANTE"]
     
-    def read_file(self):
+    
+    def valid_columns(self,cols):
+        cols = all(key in cols for key in self.columns_valid)
+        return cols
+
+    def import_data(self,ruta):
+                
         try:
-            self._document = None
+            print("------------------------------------")
+            df = pd.read_excel(ruta)
+
+            df.fillna("--",inplace=True)
+            df = df[self.columns_valid]
+            data=[]
+
+            for _,row in df.iterrows():
+                row = row.to_dict()
+
+                content={
+                        "FASE":row["FASE"],
+                        "ACTIVIDAD":row["ACTIVIDAD"],
+                        "CODIGO_ACTIVIDAD":row["CODIGO_ACTIVIDAD"],
+                        "EVIDENCIA":row["EVIDENCIA"],
+                        "FECHA":row["FECHA"],
+                        "NOTA":row["NOTA"],
+                        "OBSERVACION":row["OBSERVACION"],
+                        "IMPORTANTE":row["IMPORTANTE"]
+                    }
+                                
+                res = self.add_row(content)
+                print(res)
+                if not res['status']:
+                    data.append(row["EVIDENCIA"])
             
-            data = self.config.read_document()
-    
-            if(data != {}):
-                self._document = pd.DataFrame(data)
-                data = self.getRow(0)
-        
-                if (not len(data)):
-                    self.drop_row(0)
-                
-                self.initializeFrame()          
+            if data:
+                msg ="Informacion no cargada correctamente"
+                status = False
             else:
-                self._document = pd.DataFrame()       
+                msg ="OK"
+                status = True
 
-        except Exception as e:
-            print(self.__class__,"read_file",e)
+            self.evidencia.setResponse(status,msg, data)
+        except Exception as ex:
+            self.evidencia.setResponse(False,ex)
+        finally:
+            return self.evidencia.getResponse()
 
-        return False if self._document is None else True
+    def export_data(self,ruta):
+        try:
+            self.evidencia.select("EVIDENCIA.ID", "FASE","ACTIVIDAD","CODIGO_ACTIVIDAD", "EVIDENCIA", "FECHA", "NOTA", "OBSERVACION", "IMPORTANTE")
+            self.evidencia.join("LEFT","FASE ","ID","EVIDENCIA","FASE_FK")
+            self.evidencia.join("LEFT","ACTIVIDAD ","ID","EVIDENCIA","ACTIVIDAD_FK")
+            self.evidencia.join("LEFT","COD_ACTIVIDAD ","ID","EVIDENCIA","COD_ACTIVIDAD_FK")
+            self.evidencia.execute_query()
 
-    def initializeFrame(self):
-        if self._document is not None:
-            self._document.fillna("--", inplace=True)
-            self._document.sort_index(ascending=False,inplace=True)
+            df = pd.read_sql_query(self.evidencia.sql,self.evidencia.con)
 
-    def setDataFrame(self):
-        self.data = self._document
-        return self
-        
-    def getColumns(self):
-        data = self.getData()
-        col =None
-        if data is not None:
-            col = data.columns
-        return col
-    
-    def getData(self):
-        
-        return self._document if self.data is None else self.data
-    
-    def selectColumns(self,colums):
-        data = self.getData()
-        if data is not None:
-            try:
-                self.initializeFrame()
-                
-                #self.data = data[colums]
-            except Exception as ex:
-                print(self.__class__,"selectColumns",ex)
+            df.to_excel(ruta, index=False)
+            self.evidencia.setResponse(True,'ok')
+        except Exception as ex:
+            self.evidencia.setResponse(False,ex)
+        finally:
+            self.evidencia.close()
+            return self.evidencia.getResponse()
 
-        return self
-    
-    def setFilter(self, filter: dict):
-        
-        data = self.getData()
-        if data is not None:
-            try:
-                for columna, options in filter.items():
-                    for tipo, valores in options.items():
-                                                
-                        if tipo == "igual a":
-                            data =  data[data[columna].isin(valores)]
-                        
-                        elif tipo == "no igual":
-                            data =  data[~data[columna].isin(valores)]
-                        
-                        elif tipo == "contiene":
-                            data =  data[data[columna].astype(str).apply(lambda x: any(val in x for val in valores))]
-                        
-                        elif tipo == "no contiene":
-                            data =  data[~data[columna].astype(str).apply(lambda x: any(val in x for val in valores))]
-                        
-                        elif tipo == "empieza":
-                            data =  data[data[columna].astype(str).apply(lambda x: any(x.startswith(val) for val in valores))]
-                        
-                        elif tipo == "no empieza":
-                            data =  data[~data[columna].astype(str).apply(lambda x: any(x.startswith(val) for val in valores))]
-                        
-                        elif tipo == "termina":
-                            data =  data[data[columna].astype(str).apply(lambda x: any(x.endswith(val) for val in valores))]
-                        
-                        elif tipo == "no termina":
-                            data =  data[~data[columna].astype(str).apply(lambda x: any(x.endswith(val) for val in valores))]
-                        
-                        else:
-                            print(f"Operación no soportada: {tipo}")
-                
-                self.data = data
-            except Exception as e:
-                print(self.__class__, "setFilter", e)
-        return self
-
-    def setOrder(self,order:bool, column:str):
-        data = self.getData()
-        if data is not None:
-            
-            if column.upper() == "INDEX":
-                data.sort_index(ascending=order,inplace=True)
-            else:
-                data.sort_values(by=column.upper(),ascending=order,inplace=True)
-        return self
-
+    # OBTENER REGISTROS TOTALES
     def getLen(self):
-        data = self.getData()
-        lenData = -1
-        if data is not None:
-            lenData = len(data)
-
-        return lenData
+        data = self.evidencia.select("count(EVIDENCIA)").first()
+        return data['data'][0]
     
-    def getRow(self,index):
-        try:
-            data = self.getData()
+    def setOrder(self,order):
+        self.orde = order
 
-            data = data.loc[index] 
+    def getData(self):
+        self.evidencia.select(*self.table_cols)
+        self.evidencia.join("LEFT","FASE ","ID","EVIDENCIA","FASE_FK")
+        self.evidencia.join("LEFT","ACTIVIDAD ","ID","EVIDENCIA","ACTIVIDAD_FK")
+        self.evidencia.join("LEFT","COD_ACTIVIDAD ","ID","EVIDENCIA","COD_ACTIVIDAD_FK")
+        self.evidencia.order_by(*self.order)
 
-        except Exception as e:
-            print(self.__class__,"getRow",e)
-            
+        data = self.evidencia.get()
+
+        return data["data"]
+    
+    def prepare_data(self,data):
+        def validate_insert(object,column,column_data,content):
+                res = object.select("ID").where(column,column_data).first()
+                if(res["data"]):
+                    res = res["data"][0]
+                else:
+                    object.insert(**content)
+                    res = object.getResponse()
+                    res = res["data"]
+                
+                return res
+        ids={}
+        content ={"FASE":data['FASE']}
+        ids['ID_FASE'] = validate_insert(self.fase,'FASE',data['FASE'],content)
+        
+        content = {"ACTIVIDAD":data["ACTIVIDAD"]}
+        ids['ID_ACTIVIDAD'] = validate_insert(self.actividad,"ACTIVIDAD",data["ACTIVIDAD"],content)
+        
+        content = {"CODIGO_ACTIVIDAD":data["CODIGO_ACTIVIDAD"]}
+        ids['ID_COD_ACTIVIDAD'] = validate_insert(self.cod_actividad,"CODIGO_ACTIVIDAD",data["CODIGO_ACTIVIDAD"],content)
+
+        content = {
+            "EVIDENCIA":data["EVIDENCIA"],
+            "FECHA":data["FECHA"],
+            "NOTA":data["NOTA"],
+            "OBSERVACION":data["OBSERVACION"],
+            "IMPORTANTE":data["IMPORTANTE"],
+            "FASE_FK":ids["ID_FASE"],
+            "ACTIVIDAD_FK":ids["ID_ACTIVIDAD"],
+            "COD_ACTIVIDAD_FK":ids["ID_COD_ACTIVIDAD"]
+            }
+        
+        return content
+
+    def getRow(self, index):
+        self.evidencia.select("EVIDENCIA.ID", "FASE","ACTIVIDAD","CODIGO_ACTIVIDAD", "EVIDENCIA", "FECHA", "NOTA", "OBSERVACION", "IMPORTANTE")
+        self.evidencia.join("LEFT","FASE ","ID","EVIDENCIA","FASE_FK")
+        self.evidencia.join("LEFT","ACTIVIDAD ","ID","EVIDENCIA","ACTIVIDAD_FK")
+        self.evidencia.join("LEFT","COD_ACTIVIDAD ","ID","EVIDENCIA","COD_ACTIVIDAD_FK")
+        self.evidencia.where("EVIDENCIA.ID",index)
+        data = self.evidencia.first()
+
         return data
 
-    def add_row(self, row):
-        try:
-            band=False
-            row = pd.DataFrame([row])
-            index = -1
-            if(self.getLen()>=0):
-                index = self.getLen()
-
-                self._document = pd.concat([self._document,row],ignore_index=True)
-                band = True
-
-        except Exception as e:
-            print(self.__class__,"add_row",e)
+    def add_row(self, data):
                 
-        return band,index
+        try: 
+            if self.valid_columns(data):
+                
+                content = self.prepare_data(data)
+                
+                res =self.evidencia.select("ID").where('EVIDENCIA',data["EVIDENCIA"]).first()
+                if(res["data"]):
+                    id =res["data"][0]
+                    res = self.update(id)
+                    res["data"] = id if res['status'] else -1
+                else:
+                    self.evidencia.insert(**content)
+                    res = self.evidencia.getResponse()
+                    res = res["data"]
 
-    def edit_row(self,index:int,row:dict):
+            else:
+                self.evidencia.setResponse(False,"COLUMNS INVALIDS")
+        except Exception as ex:
+            self.evidencia.setResponse(False,'ADD ROW METHOD',ex)
+        finally:
+            return self.evidencia.getResponse()
+
+    def update(self,**content):
+        res = {"status":False}
         try:
-            band = True
-            self._document.loc[index] = row
+            if self.valid_columns(content):
+                data = self.prepare_data(content)
 
-        except Exception as e:
-            print(self.__class__,"edit_row",e)
-            band = False
-        return band
+                self.evidencia.update(**data).where('ID',content["ID"]).get()
+                
+            else:
+                self.evidencia.setResponse(False,"COLUMNS INVALIDS")
+        except Exception as ex:
+            self.evidencia.setResponse(False,'ADD ROW METHOD',ex)
+        finally:
+            return self.evidencia.getResponse()
         
-    def drop_row(self, index:int):
+    def delete(self,id):
         try:
-            band = True
-            self._document = self._document.drop(index).reset_index(drop=True)
-
-        except Exception as e:
-            print(self.__class__,"drop_row",e)
-            band = False
-
-        return band
+            self.evidencia.delete().where("ID",id).get()
+            
+            return True
+        except Exception as ex:
+            self.evidencia.setResponse(False,'DELETE ROW METHOD',ex)
     
-    def saveDataFile(self):
-        try:
-            data = None
-            band = True
+    def setFilter(self,filterData):
+        for col,options in filterData.items():
+            for opt, values in options.items():
+                for value in values :
 
-            data = self._document.to_dict(orient="list")
-            self.config.edit_json(data)
-        except Exception as e:
-            print(self.__class__,"saveDataFile",e)
-
-            band = False
-        return band
-    
-    def importDataFrame(self,ruta_archivo):
-        try:
-            _, extencion = os.path.splitext(ruta_archivo)
-            data = None
-            band = True
-
-            match(extencion):
-                case ".xlsx":
-                    data = pd.read_excel(ruta_archivo,dtype=str,header=0)
-                case ".csv":
-                    data = pd.read_csv(ruta_archivo,sep=";")
-                case _:
-                    pass
-            
-            if data is not None:
-                self._document = pd.concat([self._document,data],ignore_index=True)
-                self.initializeFrame()
-                self.saveDataFile()         
-            
-        except Exception as e:
-            print(self.__class__,"exportDataFrame",e)
-            band = False
-
-        return band
-        
-    def exportDataFrame(self,ruta_archivo):
-        try:
-            band = False
-
-            if self.read_file():
-                self._document.to_excel(ruta_archivo, sheet_name="Hoja 1", index = False)
-                band = True
-            
-            
-        except Exception as e:
-            print(self.__class__,"exportDataFrame",e)
-
-            band = False
-        return band
+                    if opt == "igual a":
+                        opt = "="
+                    
+                    elif opt == "no igual":
+                        opt = "!="
+                    
+                    elif opt == "contiene":
+                        opt = "LIKE"
+                        value = f"%{value}%"
+                    
+                    elif opt == "no contiene":
+                        opt = "NOT LIKE"
+                        value = f"%{value}%"
+                    
+                    elif opt == "empieza":
+                        opt = "LIKE"
+                        value = f"{value}%"
+                    
+                    elif opt == "no empieza":
+                        opt = "NOT LIKE"
+                        value = f"{value}%"
+                    
+                    elif opt == "termina":
+                        opt = "LIKE"
+                        value = f"%{value}"
+                    
+                    elif opt == "no termina":
+                        opt = "NOT LIKE"
+                        value = f"%{value}"
+                    else:
+                        print(f"Operación no soportada: {opt}")
+                    self.evidencia.AND(col,value,opt)
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = super(DataController, cls).__new__(cls)
         return cls._instance
-"""
-print("Empezando")
-d = DataController()
-ruta = "c:\\Users\\dicma\\Documents\\Seguimiento de notas.xlsx"
-row1 = {
-            "FASE": "fase_txt 1",
-            "ACTIVIDAD": "actividad_txt 1",
-            "CODIGO ACTIVIDAD": "cod_act_txt 1",
-            "EVIDENCIA": "evid_txt 1",
-            "FECHA": "fecha_txt 1",
-            "NOTA": "nota_txt 1",
-            "OBSERVACION": "observacion_txt 1",
-            "IMPORTANTE": "impr_check1",
-        }
-row2 = {
-            "FASE": "fase_txt 2",
-            "ACTIVIDAD": "actividad_txt 2",
-            "CODIGO ACTIVIDAD": "cod_act_txt 2",
-            "EVIDENCIA": "evid_txt 2",
-            "FECHA": "fecha_txt 2",
-            "NOTA": "nota_txt 2",
-            "OBSERVACION": "observacion_txt 2",
-            "IMPORTANTE": "impr_check2",
-        }
-row3 = {
-            "FASE": "fase_txt 3",
-            "ACTIVIDAD": "actividad_txt 3",
-            "CODIGO ACTIVIDAD": "cod_act_txt 3",
-            "EVIDENCIA": "evid_txt 3",
-            "FECHA": "fecha_txt 3",
-            "NOTA": "nota_txt 3",
-            "OBSERVACION": "observacion_txt 3",
-            "IMPORTANTE": "impr_check3",
-        }
 
-if (d.read_file()):
 
-    #d.add_row(row1)
-    #d.add_row(row3)
-    print(d.importDataFrame(ruta))
-    print(d.getData())
-    d.saveDataFile()
-    
-else:
-    print("error")
 
-#"""

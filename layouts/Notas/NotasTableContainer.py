@@ -9,7 +9,7 @@ class DataTable(PanelContainer):
         super().__init__()
         self.page = page
         self.form =None
-        self.orderBy=[False,"index"]
+        self.orderBy=["EVIDENCIA.ID","DESC"]
         self.initialize_components()
         self.scroll=ft.ScrollMode.ADAPTIVE
         self.content.controls=[
@@ -52,25 +52,24 @@ class DataTable(PanelContainer):
         
 
     def setDataTable(self):
-        
-        if (self.dataController.getData() is not None):
-            self.setTableColumns()
-            self.header.filter_view.add_items_combobox_filter(self.dataController.getColumns())
+        try:
             
-            order, column = self.orderBy
 
-            self.dataController.setDataFrame()
-            self.dataController.setOrder(order, column)
+            
+            self.setTableColumns()
+            filter_opt= self.page.session.get("col_oblig")
+            self.header.filter_view.add_items_combobox_filter(filter_opt)
+            
+            # self.dataController.setDataFrame()
+            self.dataController.setOrder(self.orderBy)
             self.dataController.setFilter(self.header.filterData)
 
-            data = self.dataController.getData()
+            data =self.dataController.getData()
+            self.fill_items(data)
+            
 
-            if(len(data)):
-                self.fill_items(data)
-            else:
-                print("setDataTable,None data")
-        try:      
-            pass 
+              
+            
         except Exception as ex:
             print(self.__class__,"setDataTable",ex)
             pass
@@ -93,7 +92,7 @@ class DataTable(PanelContainer):
             ft.Text("#",size=12,color="black", weight="bold"),
             ft.IconButton(
                 icon=ft.Icons.ARROW_DROP_DOWN,
-                data=[False,"index"],
+                data=["EVIDENCIA.ID",False],
                 on_click=self.order_column
             )
         ],expand=True,alignment=ft.MainAxisAlignment.SPACE_BETWEEN))]
@@ -103,11 +102,11 @@ class DataTable(PanelContainer):
             ft.DataColumn(
                 ft.Row([
                     ft.Text(col,size=12,color="black", weight="bold"),
-                    ft.IconButton(
-                        icon=ft.Icons.ARROW_DROP_DOWN,
-                        data=[False,col],
-                        on_click=self.order_column
-                    )
+                    # ft.IconButton(
+                    #     icon=ft.Icons.ARROW_DROP_DOWN,
+                    #     data=[col,False],
+                    #     on_click=self.order_column
+                    # )
                 ],expand=True,alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
             ) for col in self.table_cols
         ])
@@ -119,56 +118,50 @@ class DataTable(PanelContainer):
             self.table.update()
 
     def edit_row(self,e,index):
-        data = self.dataController.getRow(index)
+        resp = self.dataController.getRow(index)
 
-        if data is not None:
-            self.form.setData(data)
+        if resp["status"] == True:
+            resp = resp["data"]
+            self.form.setData(resp)
         else:
             print("none data")
 
     def order_column(self,e):
         btn = e.control
+        print(btn.data)
         
-        order, column = btn.data
-        self.orderBy = btn.data
+        column,order  = btn.data
+        
+        self.orderBy =[column, "ASC" if order else "DESC"]
 
-        self.dataController.setDataFrame()
-        self.dataController.setFilter(self.header.filterData)
-        self.dataController.setOrder(order, column)
-
-        data = self.dataController.getData()
-
+        # self.dataController.setFilter(self.header.filterData)
+        
         btn.icon = ft.Icons.ARROW_DROP_DOWN if order else ft.Icons.ARROW_DROP_UP
-        btn.data = [not order,column]
+        btn.data = [column,not order]
+        print(btn.data)
         btn.update() if btn.page else None
 
-        if(data is not None):
-            self.fill_items(data)
-
-    
+        self.setDataTable()
 
     def fill_items(self,data):
-
-        if data is not None:
+        rows=[]
+        
+        if (len(data)>0):
             self.footer.setSize(len(data))
-            data = data[self.table_cols]
+            
             #data = data.iloc[self.footer.ini:self.footer.fin]
       
-            rows=[]
-            for index,row in data.iterrows():
-                cell = [ft.DataCell(on_double_tap= lambda e, data=index: self.edit_row(e,data) ,content= ft.Text(index,color="black"))]
-  
+            for row in data:
+                index = row[0]
+
+                cell = []
                 cell.extend([ft.DataCell(on_double_tap= lambda e, data=index: self.edit_row(e,data),content= ft.Text(cell,color="black",selectable=True)) for cell in row])
                 
                 rows.append(ft.DataRow(cells=cell))
-
-            self.table.rows=rows
-            if self.table.page:
-                self.table.update()
-        else:
-            print("Data None")
-
-
+        
+        self.table.rows=rows
+        if self.table.page:
+            self.table.update()
 
 class Header(PanelContainer):
      

@@ -1,2 +1,8 @@
 controllers/Data_Base.json
+__pycache__/
+controllers/__pycache__/
+controllers/Model/__pycache__/
+layouts/__pycache__/
+layouts/Notas/__pycache__/
 venv/
+bbdd.db
